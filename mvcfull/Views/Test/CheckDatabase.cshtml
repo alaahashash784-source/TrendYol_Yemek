@@ -1,0 +1,103 @@
+@{
+    ViewBag.Title = "??? ????? ????????";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="text-center mb-5">
+                <h1 class="display-4 fw-bold text-primary">
+                    <i class="fas fa-database me-3"></i>??? ????? ????????
+                </h1>
+                <p class="lead text-muted">???? ????? ???????? ????????? ???????</p>
+            </div>
+
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-success text-white text-center py-3">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-bar me-2"></i>???????? ????? ????????
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    @if (ViewBag.Status.ToString().Contains("???? ?????"))
+                    {
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle me-2"></i>
+                            <strong>@ViewBag.Status</strong>
+                        </div>
+
+                        <div class="row text-center">
+                            <div class="col-md-4 mb-4">
+                                <div class="stat-card p-4 bg-primary text-white rounded">
+                                    <i class="fas fa-store fa-3x mb-3"></i>
+                                    <h3 class="fw-bold">@ViewBag.RestaurantCount</h3>
+                                    <p class="mb-0">????? ?????</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-4">
+                                <div class="stat-card p-4 bg-success text-white rounded">
+                                    <i class="fas fa-utensils fa-3x mb-3"></i>
+                                    <h3 class="fw-bold">@ViewBag.FoodCount</h3>
+                                    <p class="mb-0">????? ?????</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-4">
+                                <div class="stat-card p-4 bg-info text-white rounded">
+                                    <i class="fas fa-users fa-3x mb-3"></i>
+                                    <h3 class="fw-bold">@ViewBag.CustomerCount</h3>
+                                    <p class="mb-0">????? ??????</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="connection-info bg-light p-4 rounded">
+                            <h6 class="fw-bold text-success mb-3">?????? ???????:</h6>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><strong>??? ????? ????????:</strong> SQL Server LocalDB</li>
+                                <li class="mb-2"><strong>???????:</strong> ???</li>
+                                <li class="mb-2"><strong>Entity Framework:</strong> Code First</li>
+                                <li><strong>Migrations:</strong> ???????</li>
+                            </ul>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>@ViewBag.Status</strong>
+                        </div>
+
+                        <div class="troubleshooting bg-warning p-4 rounded text-dark">
+                            <h6 class="fw-bold mb-3">????? ??????? ???????:</h6>
+                            <ol>
+                                <li class="mb-2">???? ?? ????? SQL Server LocalDB</li>
+                                <li class="mb-2">???? ?? connection string ?? Web.config</li>
+                                <li class="mb-2">?? ?????? ???????? ????????? ?? /SeedData</li>
+                                <li>??? ????? ???????</li>
+                            </ol>
+                        </div>
+                    }
+
+                    <div class="text-center mt-4">
+                        <div class="btn-group" role="group">
+                            @Html.ActionLink("?????? ????????", "Index", "Test", null, new { @class = "btn btn-outline-secondary" })
+                            @Html.ActionLink("????? ?????? ???????", "Index", "SeedData", null, new { @class = "btn btn-warning" })
+                            @Html.ActionLink("?????? ????????", "Index", "Home", null, new { @class = "btn btn-primary" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .stat-card {
+        transition: transform 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+</style>

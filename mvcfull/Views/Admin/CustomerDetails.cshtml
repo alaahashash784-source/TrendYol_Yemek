@@ -1,0 +1,136 @@
+@model mvc_full.Models.Musteri
+
+@{
+    ViewBag.Title = "Musteri Detayi";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .admin-header {
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        color: white;
+        padding: 30px 0;
+        margin-bottom: 30px;
+    }
+    .profile-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 48px;
+        margin: 0 auto 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+</style>
+
+<div class="admin-header">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1><i class="fas fa-user me-3"></i>Musteri Detayi</h1>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index", "Admin")" class="text-white-50">Admin</a></li>
+                        <li class="breadcrumb-item"><a href="@Url.Action("Customers", "Admin")" class="text-white-50">Musteriler</a></li>
+                        <li class="breadcrumb-item active text-white">@Model.Ad @Model.Soyad</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-4 mb-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-body text-center py-5">
+                    @{
+                        string initials = "";
+                        if (!string.IsNullOrEmpty(Model.Ad)) { initials += Model.Ad.Substring(0, 1).ToUpper(); }
+                        if (!string.IsNullOrEmpty(Model.Soyad)) { initials += Model.Soyad.Substring(0, 1).ToUpper(); }
+                        if (string.IsNullOrEmpty(initials)) { initials = "?"; }
+                    }
+                    <div class="profile-avatar">@initials</div>
+                    <h4 class="fw-bold">@Model.Ad @Model.Soyad</h4>
+                    <p class="text-muted">ID: @Model.MusteriId</p>
+                    @if (Model.IsAdmin)
+                    {
+                        <span class="badge bg-danger fs-6"><i class="fas fa-shield-alt me-1"></i>Admin</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary fs-6">Kullanici</span>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Kisisel Bilgiler</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="text-muted small">Ad</label>
+                            <p class="fw-bold mb-0">@Model.Ad</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="text-muted small">Soyad</label>
+                            <p class="fw-bold mb-0">@Model.Soyad</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="text-muted small">E-posta</label>
+                            <p class="fw-bold mb-0">
+                                <i class="fas fa-envelope text-primary me-1"></i>
+                                @Model.Email
+                            </p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="text-muted small">Telefon</label>
+                            <p class="fw-bold mb-0">
+                                <i class="fas fa-phone text-success me-1"></i>
+                                @(string.IsNullOrEmpty(Model.Telefon) ? "Belirtilmemis" : Model.Telefon)
+                            </p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="text-muted small">Adres</label>
+                            <p class="fw-bold mb-0">
+                                <i class="fas fa-map-marker-alt text-danger me-1"></i>
+                                @(string.IsNullOrEmpty(Model.Adres) ? "Belirtilmemis" : Model.Adres)
+                            </p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="text-muted small">Kayit Tarihi</label>
+                            <p class="fw-bold mb-0">
+                                <i class="fas fa-calendar text-info me-1"></i>
+                                @Model.KayitTarihi.ToString("dd.MM.yyyy HH:mm")
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between">
+                <a href="@Url.Action("Customers", "Admin")" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Geri Don
+                </a>
+                @if (!Model.IsAdmin)
+                {
+                    <a href="@Url.Action("DeleteCustomer", "Admin", new { id = Model.MusteriId })" 
+                       class="btn btn-danger"
+                       onclick="return confirm('Bu musteriyi silmek istediginizden emin misiniz?');">
+                        <i class="fas fa-trash me-2"></i>Musteriyi Sil
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
+</div>

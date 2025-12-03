@@ -1,0 +1,421 @@
+/* Home Page Styles - TrendYol Yemek */
+
+/* Hero Section */
+.hero-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    position: relative;
+    overflow: hidden;
+    min-height: 100vh;
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="1" fill="white" opacity="0.1"/></svg>');
+    background-size: 30px 30px;
+    z-index: 1;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+}
+
+.floating-animation {
+    animation: float 6s ease-in-out infinite;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+}
+
+/* Scroll Indicator */
+.scroll-indicator {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+    font-size: 2rem;
+    cursor: pointer;
+    z-index: 2;
+    transition: transform 0.3s ease;
+}
+
+.scroll-indicator:hover {
+    transform: translateX(-50%) scale(1.1);
+}
+
+/* Search Section */
+.search-card {
+    border-radius: 15px;
+    margin-top: -50px;
+    position: relative;
+    z-index: 3;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.search-section .input-group-text {
+    border: none;
+}
+
+.search-section .form-control:focus {
+    border-color: transparent;
+    box-shadow: none;
+}
+
+/* Feature Cards */
+.feature-card {
+    background: white;
+    border-radius: 15px;
+    transition: all 0.3s ease;
+    border: 1px solid #f0f0f0;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+}
+
+.feature-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+}
+
+.feature-icon {
+    transition: transform 0.3s ease;
+}
+
+.feature-card:hover .feature-icon {
+    transform: scale(1.1);
+}
+
+/* Restaurant Cards */
+.restaurant-card {
+    transition: all 0.3s ease;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.restaurant-card:hover {
+    transform: translateY(-5px);
+}
+
+.restaurant-image-container {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+}
+
+.restaurant-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.restaurant-card:hover .restaurant-image {
+    transform: scale(1.1);
+}
+
+.restaurant-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.restaurant-card:hover .restaurant-overlay {
+    opacity: 1;
+}
+
+.restaurant-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 10;
+}
+
+/* Shadow Effects */
+.shadow-hover {
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+/* Statistics Section */
+.stats-section {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+}
+
+.stat-item {
+    padding: 20px;
+}
+
+.stat-number {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.stat-label {
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+/* CTA Section */
+.cta-section {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.cta-buttons {
+    gap: 15px;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* Button Styles */
+.btn {
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    border: none;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.btn-warning {
+    background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+    color: white;
+}
+
+.btn-warning:hover {
+    background: linear-gradient(135deg, #19547b 0%, #ffd89b 100%);
+    color: white;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    border: none;
+}
+
+.btn-success:hover {
+    background: linear-gradient(135deg, #38ef7d 0%, #11998e 100%);
+}
+
+/* Additional Features */
+.additional-features {
+    background: #f8f9fa;
+}
+
+.feature-item {
+    transition: transform 0.3s ease;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+}
+
+.feature-item:hover {
+    transform: translateY(-5px);
+}
+
+.feature-item .feature-icon {
+    transition: transform 0.3s ease;
+}
+
+.feature-item:hover .feature-icon {
+    transform: scale(1.1);
+}
+
+/* Empty State */
+.empty-state {
+    padding: 50px 20px;
+}
+
+.empty-state i {
+    margin-bottom: 20px;
+    opacity: 0.5;
+}
+
+/* Loading Animation */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.fa-spinner {
+    animation: spin 1s linear infinite;
+}
+
+/* Rating Stars */
+.rating {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.rating .fa-star {
+    font-size: 0.9rem;
+}
+
+/* Delivery Time */
+.delivery-time {
+    display: flex;
+    align-items: center;
+    color: #28a745;
+    font-weight: 600;
+}
+
+.delivery-time .fas {
+    margin-right: 5px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hero-section {
+        padding: 50px 0;
+        min-height: 70vh;
+    }
+    
+    .display-3 {
+        font-size: 2.5rem;
+    }
+    
+    .hero-buttons .btn {
+        margin-bottom: 10px;
+        width: 100%;
+    }
+
+    .search-card .row > div {
+        margin-bottom: 15px;
+    }
+
+    .restaurant-info {
+        flex-direction: column;
+        align-items: flex-start !important;
+    }
+
+    .delivery-time {
+        margin-top: 10px;
+    }
+
+    .cta-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .cta-buttons .btn {
+        width: 100%;
+        max-width: 300px;
+    }
+
+    .stat-number {
+        font-size: 2.5rem;
+    }
+
+    .feature-card {
+        margin-bottom: 20px;
+    }
+}
+
+@media (max-width: 576px) {
+    .display-4 {
+        font-size: 2rem;
+    }
+
+    .btn-lg {
+        padding: 12px 24px;
+        font-size: 1rem;
+    }
+
+    .stat-item {
+        margin-bottom: 30px;
+        padding: 15px;
+    }
+
+    .hero-content h1 {
+        font-size: 2rem;
+    }
+
+    .hero-content .lead {
+        font-size: 1rem;
+    }
+
+    .search-card {
+        margin: 0 15px;
+        margin-top: -30px;
+    }
+
+    .restaurant-image-container {
+        height: 150px;
+    }
+}
+
+/* Animation Classes */
+.animate-on-scroll {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.6s ease;
+}
+
+.animate-on-scroll.animated {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+}
+
+/* Focus States */
+.btn:focus,
+.form-control:focus {
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+/* Print Styles */
+@media print {
+    .hero-section,
+    .scroll-indicator,
+    .btn,
+    .feature-icon {
+        display: none !important;
+    }
+}

@@ -1,0 +1,22 @@
+/* Default image placeholders for TrendYol Yemek */
+
+/* This file contains CSS for placeholder images */
+.default-food-image {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    height: 200px;
+}
+
+.default-restaurant-image {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 4rem;
+    height: 250px;
+}
