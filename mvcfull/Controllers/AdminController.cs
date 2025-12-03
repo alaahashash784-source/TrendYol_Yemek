@@ -9,10 +9,7 @@ using mvc_full.Filters;
 
 namespace mvc_full.Controllers
 {
-    /// <summary>
-    /// Admin controller for managing the application.
-    /// Requires authentication to access.
-    /// </summary>
+    // Admin controller - requires authentication
     [CustomAuthorizationFilter]
     public class AdminController : Controller
     {

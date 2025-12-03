@@ -1,4 +1,3 @@
-// كنترولر المطاعم - عرض وإدارة المطاعم
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
@@ -11,20 +10,19 @@ using mvc_full.Filters;
 
 namespace mvc_full.Controllers
 {
-    // إدارة المطاعم - هذا الكنترولر يتحكم في عمليات المطاعم
+    // Restaurant controller - CRUD operations
     public class RestaurantController : Controller
     {
-        // كائن الاتصال بالقاعدة
         private ABCDbContext db = new ABCDbContext();
 
-        // الصفحة الرئيسية للمطاعم
+        // GET: Restaurant
         public ActionResult Index()
         {
             var restaurants = db.Restoranlar.ToList();
             return View(restaurants);
         }
 
-        // عرض تفاصيل مطعم واحد مع أطعمته
+        // GET: Restaurant/Details/5
         public ActionResult Details(int? id)
         {
             if (id == null)
@@ -38,22 +36,21 @@ namespace mvc_full.Controllers
                 return HttpNotFound();
             }
 
-            // جلب أطعمة هذا المطعم
+            // Get foods for this restaurant
             var foods = db.Yemekler.Where(y => y.RestoranId == id).ToList();
             ViewBag.Foods = foods;
 
             return View(restaurant);
         }
 
-        // صفحة إضافة مطعم جديد
-        // TODO: إضافة خريطة لاختيار الموقع
+        // GET: Restaurant/Create
         [AdminAuthorizationFilter]
         public ActionResult Create()
         {
             return View();
         }
 
-        // حفظ المطعم الجديد
+        // POST: Restaurant/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         [AdminAuthorizationFilter]
@@ -69,7 +66,7 @@ namespace mvc_full.Controllers
             return View(restoran);
         }
 
-        // تعديل بيانات مطعم
+        // GET: Restaurant/Edit/5
         [AdminAuthorizationFilter]
         public ActionResult Edit(int? id)
         {
@@ -103,7 +100,7 @@ namespace mvc_full.Controllers
             return View(restoran);
         }
 
-        // صفحة حذف مطعم
+        // GET: Restaurant/Delete/5
         [AdminAuthorizationFilter]
         public ActionResult Delete(int? id)
         {
@@ -133,18 +130,18 @@ namespace mvc_full.Controllers
                 return HttpNotFound();
             }
             
-            // Önce bu restorana ait tüm yemekleri sil
+            // Delete related foods first
             var yemekler = db.Yemekler.Where(y => y.RestoranId == id).ToList();
             foreach (var yemek in yemekler)
             {
-                // Sepetten de bu yemekleri temizle
+                // Remove from cart
                 var sepetItems = db.Sepetler.Where(s => s.YemekId == yemek.YemekId).ToList();
                 db.Sepetler.RemoveRange(sepetItems);
                 
                 db.Yemekler.Remove(yemek);
             }
             
-            // Sonra restoranı sil
+            // Then delete restaurant
             db.Restoranlar.Remove(restoran);
             db.SaveChanges();
             

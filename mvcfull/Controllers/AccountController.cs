@@ -1,4 +1,3 @@
-// كنترولر الحسابات - تسجيل الدخول والخروج وإدارة المستخدمين
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,17 +10,14 @@ using mvc_full.Helpers;
 
 namespace mvc_full.Controllers
 {
-    // هذا الكلاس مسؤول عن إدارة حسابات المستخدمين
-    // يتضمن: تسجيل الدخول، إنشاء حساب جديد، تعديل الملف الشخصي
-    // TODO: إضافة خاصية استعادة كلمة المرور لاحقاً
+    // Account controller - login, register, profile management
     public class AccountController : Controller
     {
         private ABCDbContext db = new ABCDbContext();
 
-        // صفحة التسجيل - GET
+        // GET: Register
         public ActionResult Register()
         {
-            // إذا كان المستخدم مسجل دخول، نحوله للصفحة الرئيسية
             if (Session["MusteriId"] != null)
             {
                 return RedirectToAction("Index", "Home");
@@ -29,18 +25,15 @@ namespace mvc_full.Controllers
             return View();
         }
 
-        // POST: Account/Register
-        // Fixed: Added proper password hashing for security
+        // POST: Register
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Register(RegisterViewModel model)
         {
             if (ModelState.IsValid)
             {
-                // تحويل الإيميل لحروف صغيرة للمقارنة الصحيحة
-                string email = model.Email?.ToLowerInvariant(); // TODO: ممكن نضيف تحقق أفضل
+                string email = model.Email?.ToLowerInvariant();
                 
-                // نتحقق إذا الإيميل موجود مسبقاً
                 var user = db.Musteriler.FirstOrDefault(m => m.Email.ToLower() == email);
                 if (user != null)
                 {
@@ -48,7 +41,7 @@ namespace mvc_full.Controllers
                     return View(model);
                 }
 
-                // إنشاء مستخدم جديد مع تشفير كلمة المرور
+                // Create new user with hashed password
                 var musteri = new Musteri
                 {
                     Ad = model.Ad?.Trim(),
@@ -56,14 +49,14 @@ namespace mvc_full.Controllers
                     Email = email,
                     Telefon = model.Telefon?.Trim(),
                     Adres = model.Adres?.Trim(),
-                    Sifre = SecurityHelper.HashPassword(model.Sifre), // تشفير كلمة المرور
+                    Sifre = SecurityHelper.HashPassword(model.Sifre),
                     KayitTarihi = DateTime.Now
                 };
 
                 db.Musteriler.Add(musteri);
                 db.SaveChanges();
 
-                // حفظ بيانات المستخدم في الجلسة
+                // Save session
                 Session["MusteriId"] = musteri.MusteriId;
                 Session["MusteriAd"] = musteri.TamAd;
 
@@ -74,10 +67,9 @@ namespace mvc_full.Controllers
             return View(model);
         }
 
-        // صفحة تسجيل الدخول
+        // GET: Login
         public ActionResult Login()
         {
-            // لو مسجل دخول، روح للصفحة الرئيسية
             if (Session["MusteriId"] != null)
             {
                 return RedirectToAction("Index", "Home");
@@ -85,31 +77,27 @@ namespace mvc_full.Controllers
             return View();
         }
 
-        // معالجة تسجيل الدخول
-        // نتحقق من كلمة المرور المشفرة
+        // POST: Login
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Login(LoginViewModel model, string returnUrl)
         {
             if (ModelState.IsValid)
             {
-                // تحويل الإيميل لحروف صغيرة
                 string email = model.Email?.ToLowerInvariant();
-                
-                // البحث عن المستخدم بالإيميل
                 var musteri = db.Musteriler.FirstOrDefault(m => m.Email.ToLower() == email);
 
                 if (musteri != null)
                 {
-                    // التحقق من كلمة المرور
+                    // Verify password
                     if (SecurityHelper.VerifyPassword(model.Sifre, musteri.Sifre))
                     {
-                        // حفظ الجلسة
+                        // Save session
                         Session["MusteriId"] = musteri.MusteriId;
                         Session["MusteriAd"] = musteri.TamAd;
                         Session["IsAdmin"] = musteri.IsAdmin;
 
-                        // إعادة التوجيه للصفحة المطلوبة
+                        // Redirect
                         if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
                         {
                             return Redirect(returnUrl);
@@ -119,21 +107,21 @@ namespace mvc_full.Controllers
                     }
                 }
 
-                // رسالة خطأ عامة لأسباب أمنية
+                // Generic error for security
                 ModelState.AddModelError("", "Email veya sifre hatali");
             }
 
             return View(model);
         }
 
-        // تسجيل الخروج
+        // GET: Logout
         public ActionResult Logout()
         {
-            // مسح جميع بيانات الجلسة
+            // Clear session
             Session.Clear();
             Session.Abandon();
             
-            // مسح الكوكيز - TODO: ممكن نضيف تأكيد قبل الخروج
+            // Clear cookies
             if (Request.Cookies["ASP.NET_SessionId"] != null)
             {
                 Response.Cookies["ASP.NET_SessionId"].Expires = DateTime.Now.AddDays(-1);
@@ -143,8 +131,7 @@ namespace mvc_full.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        // GET: Account/Profile
-        // Note: Using 'new' keyword because Controller base class has a Profile property
+        // GET: Profile
         public new ActionResult Profile()
         {
             if (Session["MusteriId"] == null)
@@ -157,7 +144,6 @@ namespace mvc_full.Controllers
 
             if (musteri == null)
             {
-                // Session has invalid user, clear it
                 Session.Clear();
                 return RedirectToAction("Login");
             }
@@ -165,9 +151,7 @@ namespace mvc_full.Controllers
             return View(musteri);
         }
 
-        // POST: Account/Profile
-        // Fixed: Proper password update with hashing
-        // Note: Using 'new' keyword because Controller base class has a Profile property
+        // POST: Profile
         [HttpPost]
         [ValidateAntiForgeryToken]
         public new ActionResult Profile(Musteri musteri)
@@ -177,14 +161,14 @@ namespace mvc_full.Controllers
                 return RedirectToAction("Login");
             }
 
-            // Ensure user can only edit their own profile
+            // Ensure user can only edit own profile
             int currentUserId = (int)Session["MusteriId"];
             if (musteri.MusteriId != currentUserId)
             {
                 return new HttpStatusCodeResult(403, "Forbidden");
             }
 
-            // Remove Sifre from validation if not being updated
+            // Skip password validation if not updating
             if (string.IsNullOrEmpty(musteri.Sifre))
             {
                 ModelState.Remove("Sifre");
@@ -195,14 +179,14 @@ namespace mvc_full.Controllers
                 var existingMusteri = db.Musteriler.Find(musteri.MusteriId);
                 if (existingMusteri != null)
                 {
-                    // Update basic info
+                    // Update info
                     existingMusteri.Ad = musteri.Ad?.Trim();
                     existingMusteri.Soyad = musteri.Soyad?.Trim();
                     existingMusteri.Email = musteri.Email?.ToLowerInvariant();
                     existingMusteri.Telefon = musteri.Telefon?.Trim();
                     existingMusteri.Adres = musteri.Adres?.Trim();
 
-                    // Only update password if provided (and hash it)
+                    // Hash password if provided
                     if (!string.IsNullOrEmpty(musteri.Sifre))
                     {
                         existingMusteri.Sifre = SecurityHelper.HashPassword(musteri.Sifre);
@@ -235,13 +219,13 @@ namespace mvc_full.Controllers
             return View(orders);
         }
 
-        // GET: Account/ForgotPassword - صفحة استعادة كلمة المرور
+        // GET: ForgotPassword
         public ActionResult ForgotPassword()
         {
             return View();
         }
 
-        // POST: Account/ForgotPassword - معالجة طلب استعادة كلمة المرور
+        // POST: ForgotPassword
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult ForgotPassword(string Email)
@@ -257,13 +241,12 @@ namespace mvc_full.Controllers
 
             if (musteri != null)
             {
-                // في التطبيق الحقيقي: إرسال إيميل برابط إعادة التعيين
-                // هنا نعرض رسالة نجاح فقط
+                // In real app: send email with reset link
                 TempData["Success"] = "Sifre sifirlama linki e-posta adresinize gonderildi. Lutfen e-postanizi kontrol edin.";
             }
             else
             {
-                // لا نخبر المستخدم أن الإيميل غير موجود لأسباب أمنية
+                // Don't reveal if email exists
                 TempData["Success"] = "Eger bu e-posta adresi sistemimizde kayitliysa, sifre sifirlama linki gonderilecektir.";
             }
 
