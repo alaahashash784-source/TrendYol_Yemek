@@ -47,7 +47,12 @@
                     </ol>
                 </nav>
             </div>
-            <span class="badge bg-light text-dark fs-5">@Model.Count() Musteri</span>
+            <div class="d-flex align-items-center gap-2">
+                <a href="@Url.Action("ExportCustomersCsv", "Admin")" class="btn btn-success">
+                    <i class="fas fa-file-csv me-1"></i>CSV Indir
+                </a>
+                <span class="badge bg-light text-dark fs-5">@Model.Count() Musteri</span>
+            </div>
         </div>
     </div>
 </div>

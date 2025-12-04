@@ -45,9 +45,14 @@
                     </ol>
                 </nav>
             </div>
-            <span class="badge bg-light text-dark">
-                <i class="fas fa-calendar me-1"></i>Son 30 Gun
-            </span>
+            <div class="d-flex align-items-center gap-2">
+                <a href="@Url.Action("ExportReportsCsv", "Admin")" class="btn btn-success">
+                    <i class="fas fa-file-csv me-1"></i>CSV Indir
+                </a>
+                <span class="badge bg-light text-dark">
+                    <i class="fas fa-calendar me-1"></i>Son 30 Gun
+                </span>
+            </div>
         </div>
     </div>
 </div>

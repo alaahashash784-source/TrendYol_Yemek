@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Text;
 using System.Web;
 using System.Web.Mvc;
 using mvc_full.Models;
@@ -183,6 +184,93 @@ namespace mvc_full.Controllers
                 db.Dispose();
             }
             base.Dispose(disposing);
+        }
+
+        // GET: Admin/ExportOrdersCsv - Export orders to CSV
+        public ActionResult ExportOrdersCsv()
+        {
+            var orders = db.OrderPages.OrderByDescending(o => o.OrderDate).ToList();
+            
+            var csv = new StringBuilder();
+            // Add UTF-8 BOM for Excel compatibility
+            csv.Append('\uFEFF');
+            // Header
+            csv.AppendLine("Siparis No,Musteri ID,Toplam Tutar (TL),Teslimat Adresi,Odeme Yontemi,Siparis Tarihi,Siparis Durumu");
+            
+            foreach (var order in orders)
+            {
+                csv.AppendLine($"{order.OrderId},{order.MusteriId},{order.TotalPrice:F2},{EscapeCsvField(order.DeliveryAddress)},{EscapeCsvField(order.PaymentMethod)},{order.OrderDate:yyyy-MM-dd HH:mm},{EscapeCsvField(order.OrderStatus)}");
+            }
+
+            var fileName = $"Siparisler_{DateTime.Now:yyyyMMdd_HHmmss}.csv";
+            return File(Encoding.UTF8.GetBytes(csv.ToString()), "text/csv", fileName);
+        }
+
+        // GET: Admin/ExportCustomersCsv - Export customers to CSV
+        public ActionResult ExportCustomersCsv()
+        {
+            var customers = db.Musteriler.OrderByDescending(m => m.KayitTarihi).ToList();
+            
+            var csv = new StringBuilder();
+            // Add UTF-8 BOM for Excel compatibility
+            csv.Append('\uFEFF');
+            // Header
+            csv.AppendLine("Musteri ID,Ad,Soyad,Email,Telefon,Adres,Kayit Tarihi,Admin Mi");
+            
+            foreach (var customer in customers)
+            {
+                csv.AppendLine($"{customer.MusteriId},{EscapeCsvField(customer.Ad)},{EscapeCsvField(customer.Soyad)},{EscapeCsvField(customer.Email)},{EscapeCsvField(customer.Telefon)},{EscapeCsvField(customer.Adres)},{customer.KayitTarihi:yyyy-MM-dd HH:mm},{(customer.IsAdmin ? "Evet" : "Hayir")}");
+            }
+
+            var fileName = $"Musteriler_{DateTime.Now:yyyyMMdd_HHmmss}.csv";
+            return File(Encoding.UTF8.GetBytes(csv.ToString()), "text/csv", fileName);
+        }
+
+        // GET: Admin/ExportReportsCsv - Export daily reports to CSV
+        public ActionResult ExportReportsCsv()
+        {
+            var allOrders = db.OrderPages.ToList();
+            var thirtyDaysAgo = DateTime.Today.AddDays(-30);
+            
+            var dailyStats = allOrders
+                .Where(o => o.OrderDate.Date >= thirtyDaysAgo)
+                .GroupBy(o => o.OrderDate.Date)
+                .Select(g => new
+                {
+                    Date = g.Key,
+                    OrderCount = g.Count(),
+                    TotalRevenue = g.Sum(o => o.TotalPrice)
+                })
+                .OrderByDescending(d => d.Date)
+                .ToList();
+            
+            var csv = new StringBuilder();
+            // Add UTF-8 BOM for Excel compatibility
+            csv.Append('\uFEFF');
+            // Header
+            csv.AppendLine("Tarih,Siparis Sayisi,Toplam Gelir (TL)");
+            
+            foreach (var stat in dailyStats)
+            {
+                csv.AppendLine($"{stat.Date:yyyy-MM-dd},{stat.OrderCount},{stat.TotalRevenue:F2}");
+            }
+
+            var fileName = $"Gunluk_Rapor_{DateTime.Now:yyyyMMdd_HHmmss}.csv";
+            return File(Encoding.UTF8.GetBytes(csv.ToString()), "text/csv", fileName);
+        }
+
+        // Helper method to escape CSV fields
+        private string EscapeCsvField(string field)
+        {
+            if (string.IsNullOrEmpty(field))
+                return "";
+            
+            // If field contains comma, quote, or newline, wrap in quotes and escape quotes
+            if (field.Contains(",") || field.Contains("\"") || field.Contains("\n") || field.Contains("\r"))
+            {
+                return "\"" + field.Replace("\"", "\"\"") + "\"";
+            }
+            return field;
         }
     }
 
