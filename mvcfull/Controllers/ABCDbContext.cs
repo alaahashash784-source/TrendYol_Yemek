@@ -1,4 +1,9 @@
-﻿using System;
+﻿// ═══════════════════════════════════════════════════════════════════════════════
+// ملف: ABCDbContext.cs
+// الغرض: الاتصال بقاعدة البيانات SQL Server
+// الشرح: هذا هو "الجسر" بين الكود C# وقاعدة البيانات - يحول الجداول لـ Objects
+// ═══════════════════════════════════════════════════════════════════════════════
+using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Data.Entity.ModelConfiguration.Conventions;
@@ -7,33 +12,48 @@ using System.Web;
 
 namespace mvc_full.Models
 {
-    // Database context - manages SQL Server connection
+    // كلاس قاعدة البيانات - يرث من DbContext (Entity Framework)
     public class ABCDbContext : DbContext
     {
-        // Constructor - uses ABCConnectionstring from Web.config
+        // ═══════════════════════════════════════════════════════════════════
+        // Constructor - إعداد الاتصال بقاعدة البيانات
+        // "ABCConnectionstring" = اسم الاتصال في Web.config
+        // ═══════════════════════════════════════════════════════════════════
         public ABCDbContext() : base("ABCConnectionstring")
         { 
+            // إنشاء قاعدة البيانات تلقائياً إذا لم تكن موجودة
             Database.SetInitializer(new CreateDatabaseIfNotExists<ABCDbContext>());
+            // تفعيل Lazy Loading - تحميل العلاقات عند الحاجة فقط
             this.Configuration.LazyLoadingEnabled = true;
+            // تفعيل Proxy - لعمل الـ Lazy Loading
             this.Configuration.ProxyCreationEnabled = true;
         }
     
-        // DbSet properties
-        public DbSet<OrderPage> OrderPages { get; set; }
-        public DbSet<Fatura> Faturalar { get; set; }
-        public DbSet<Musteri> Musteriler { get; set; }
-        public DbSet<Restoran> Restoranlar { get; set; }
-        public DbSet<Sepet> Sepetler { get; set; }
-        public DbSet<TrendYol_Platformu> TrendYolPlatformlar { get; set; }
-        public DbSet<Yemek> Yemekler { get; set; }
+        // ═══════════════════════════════════════════════════════════════════
+        // DbSet = يمثل جدول في قاعدة البيانات
+        // كل DbSet يتحول لجدول SQL
+        // ═══════════════════════════════════════════════════════════════════
+        public DbSet<OrderPage> OrderPages { get; set; }        // جدول الطلبات
+        public DbSet<Fatura> Faturalar { get; set; }            // جدول الفواتير
+        public DbSet<Musteri> Musteriler { get; set; }          // جدول الزبائن
+        public DbSet<Restoran> Restoranlar { get; set; }        // جدول المطاعم
+        public DbSet<Sepet> Sepetler { get; set; }              // جدول السلة
+        public DbSet<TrendYol_Platformu> TrendYolPlatformlar { get; set; } // جدول المنصة
+        public DbSet<Yemek> Yemekler { get; set; }              // جدول الأطعمة
 
-        // Configure model relationships
+        // ═══════════════════════════════════════════════════════════════════
+        // إعداد العلاقات والقيود بين الجداول
+        // تُستدعى تلقائياً عند إنشاء قاعدة البيانات
+        // ═══════════════════════════════════════════════════════════════════
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
+            // إزالة الجمع التلقائي لأسماء الجداول
             modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();
+            
+            // تحديد دقة الأرقام العشرية (للأسعار)
             modelBuilder.Entity<Yemek>()
                 .Property(y => y.Fiyat)
-                .HasPrecision(18, 2);
+                .HasPrecision(18, 2);  // 18 رقم، 2 بعد الفاصلة
                 
             modelBuilder.Entity<Sepet>()
                 .Property(s => s.Fiyat)

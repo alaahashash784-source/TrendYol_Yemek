@@ -1,3 +1,8 @@
+// ═══════════════════════════════════════════════════════════════════════════════
+// ملف: Musteri.cs (Model)
+// الغرض: تمثيل جدول الزبائن في قاعدة البيانات
+// الشرح: هذا الـ Model يتحول لجدول "Musteriler" في SQL Server
+// ═══════════════════════════════════════════════════════════════════════════════
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -7,35 +12,54 @@ using System.Web;
 
 namespace mvc_full.Models
 {
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // [Table("Musteriler")] = اسم الجدول في قاعدة البيانات
+    // ═══════════════════════════════════════════════════════════════════════════════
     [Table("Musteriler")]
     public class Musteri
     {
+        // ═══════════════════════════════════════════════════════════════════
+        // Primary Key - المفتاح الأساسي (يتزايد تلقائياً)
+        // ═══════════════════════════════════════════════════════════════════
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public int MusteriId { get; set; }    
 
-        [Required(ErrorMessage = "Ad gerekli")]
+        // ═══════════════════════════════════════════════════════════════════
+        // بيانات المستخدم الأساسية
+        // [Required] = حقل إجباري
+        // [StringLength] = الحد الأقصى للأحرف
+        // ═══════════════════════════════════════════════════════════════════
+        [Required(ErrorMessage = "Ad gerekli")]           // الاسم إجباري
         [Display(Name = "Ad")]
         [StringLength(50)]
         public string Ad { get; set; }   
-        [Required(ErrorMessage = "Soyad gerekli")]
+
+        [Required(ErrorMessage = "Soyad gerekli")]        // اللقب إجباري
         [Display(Name = "Soyad")]
         [StringLength(50)]
         public string Soyad { get; set; }   
 
+        // ═══════════════════════════════════════════════════════════════════
+        // بيانات تسجيل الدخول
+        // ═══════════════════════════════════════════════════════════════════
         [Required(ErrorMessage = "Email gerekli")]
         [Display(Name = "E-posta")]
-        [EmailAddress(ErrorMessage = "Ge�erli bir email adresi giriniz")]
+        [EmailAddress(ErrorMessage = "Gecerli bir email adresi giriniz")]  // التحقق من صيغة الإيميل
         [StringLength(100)]
         public string Email { get; set; }     
-        [Required(ErrorMessage = "�ifre gerekli")]
-        [Display(Name = "�ifre")]
-        [DataType(DataType.Password)]
-        [StringLength(100, MinimumLength = 6, ErrorMessage = "�ifre en az 6 karakter olmal�d�r")]
+
+        [Required(ErrorMessage = "Sifre gerekli")]
+        [Display(Name = "Sifre")]
+        [DataType(DataType.Password)]                     // يظهر كنجوم ***
+        [StringLength(100, MinimumLength = 6, ErrorMessage = "Sifre en az 6 karakter olmalidir")]
         public string Sifre { get; set; }     
 
-        [Display(Name = "Telefon Numaras�")]
-        [Phone(ErrorMessage = "Ge�erli bir telefon numaras� giriniz")]
+        // ═══════════════════════════════════════════════════════════════════
+        // بيانات التواصل والتوصيل
+        // ═══════════════════════════════════════════════════════════════════
+        [Display(Name = "Telefon Numarasi")]
+        [Phone(ErrorMessage = "Gecerli bir telefon numarasi giriniz")]
         [StringLength(20)]
         public string Telefon { get; set; }   
 
@@ -43,22 +67,32 @@ namespace mvc_full.Models
         [StringLength(500)]
         public string Adres { get; set; }     
         
-        [Display(Name = "Kay�t Tarihi")]
-        public DateTime KayitTarihi { get; set; } = DateTime.Now; 
+        // ═══════════════════════════════════════════════════════════════════
+        // بيانات النظام
+        // ═══════════════════════════════════════════════════════════════════
+        [Display(Name = "Kayit Tarihi")]
+        public DateTime KayitTarihi { get; set; } = DateTime.Now;  // تاريخ التسجيل
 
         [Display(Name = "Admin Mi?")]
-        public bool IsAdmin { get; set; } = false; // Admin kullanıcı mı?
+        public bool IsAdmin { get; set; } = false;  // هل المستخدم أدمن؟
 
-        // Navigation Properties
-        public virtual ICollection<Sepet> Sepetler { get; set; }
-        public virtual ICollection<OrderPage> Siparisler { get; set; }
-        public virtual ICollection<Fatura> Faturalar { get; set; }
+        // ═══════════════════════════════════════════════════════════════════
+        // Navigation Properties - العلاقات مع الجداول الأخرى
+        // virtual = للـ Lazy Loading (تحميل عند الحاجة)
+        // ═══════════════════════════════════════════════════════════════════
+        public virtual ICollection<Sepet> Sepetler { get; set; }      // سلات الزبون
+        public virtual ICollection<OrderPage> Siparisler { get; set; } // طلبات الزبون
+        public virtual ICollection<Fatura> Faturalar { get; set; }    // فواتير الزبون
 
+        // ═══════════════════════════════════════════════════════════════════
+        // خاصية محسوبة - لا تُخزَّن في قاعدة البيانات
+        // [NotMapped] = لا تنشئ عمود لهذه الخاصية
+        // ═══════════════════════════════════════════════════════════════════
         [NotMapped]
         [Display(Name = "Tam Ad")]
         public string TamAd
         {
-            get { return Ad + " " + Soyad; }
+            get { return Ad + " " + Soyad; }  // دمج الاسم واللقب
         }
     }
 }

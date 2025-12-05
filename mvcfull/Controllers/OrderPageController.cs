@@ -1,4 +1,8 @@
-// كنترولر السلة والطلبات - إدارة عملية الشراء
+// ═══════════════════════════════════════════════════════════════════════════════
+// ملف: OrderPageController.cs
+// الغرض: إدارة سلة التسوق وعمليات الشراء
+// الشرح: هذا الكنترولر يتحكم بإضافة/حذف المنتجات من السلة وإتمام الطلب
+// ═══════════════════════════════════════════════════════════════════════════════
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
@@ -10,47 +14,61 @@ using mvc_full.Models;
 
 namespace mvc_full.Controllers
 {
-    // كنترولر السلة والطلبات - إدارة عملية الشراء
-    // TODO: إضافة خاصية حفظ السلة في قاعدة البيانات لاحقاً
+    // كنترولر السلة - يدير كل عمليات الشراء
     public class OrderPageController : Controller
     {
-        // الاتصال بالقاعدة
+        // ═══════════════════════════════════════════════════════════════════
+        // الاتصال بقاعدة البيانات
+        // ═══════════════════════════════════════════════════════════════════
         private ABCDbContext db = new ABCDbContext();
 
-        // عرض سلة التسوق
+        // ═══════════════════════════════════════════════════════════════════
+        // عرض صفحة السلة - تعرض كل المنتجات المضافة
+        // الرابط: /OrderPage/Index
+        // ═══════════════════════════════════════════════════════════════════
         public ActionResult Index()
         {
+            // جلب عناصر السلة من الـ Session
             var cartItems = GetCartItems();
+            // حساب العدد الإجمالي
             ViewBag.CartCount = cartItems.Sum(x => x.Miktar);
+            // حساب المبلغ الإجمالي
             ViewBag.CartTotal = cartItems.Sum(x => x.ToplamFiyat);
+            // إرسال القائمة للـ View
             return View(cartItems);
         }
 
-        // صفحة إتمام الطلب
+        // ═══════════════════════════════════════════════════════════════════
+        // صفحة إتمام الطلب (Checkout) - إدخال بيانات التوصيل
+        // الرابط: /OrderPage/Checkout
+        // ═══════════════════════════════════════════════════════════════════
         public ActionResult Checkout()
         {
             var cartItems = GetCartItems();
-            // التحقق من وجود منتجات في السلة
+            
+            // التحقق: السلة فارغة؟
             if (!cartItems.Any())
             {
                 TempData["Error"] = "Sepetiniz bos. Lutfen sepete urun ekleyin.";
                 return RedirectToAction("Index", "Home");
             }
 
-            var araToplam = cartItems.Sum(x => x.ToplamFiyat);
-            var kdv = araToplam * 0.08m; // ضريبة 8%
-            var teslimatUcreti = 0m; // التوصيل مجاني
+            // حساب الأسعار
+            var araToplam = cartItems.Sum(x => x.ToplamFiyat);  // المجموع الفرعي
+            var kdv = araToplam * 0.08m;                         // الضريبة 8%
+            var teslimatUcreti = 0m;                             // رسوم التوصيل (مجاني)
 
+            // إعداد نموذج الـ Checkout
             var checkoutModel = new CheckoutViewModel
             {
                 SepetUrunleri = cartItems,
                 AraToplam = araToplam,
                 KDV = kdv,
                 TeslimatUcreti = teslimatUcreti,
-                GenelToplam = araToplam + kdv + teslimatUcreti
+                GenelToplam = araToplam + kdv + teslimatUcreti   // المجموع الكلي
             };
 
-            // ملء بيانات المستخدم إن كان مسجل الدخول
+            // إذا المستخدم مسجل دخول = نملأ بياناته تلقائياً
             if (Session["MusteriId"] != null)
             {
                 var musteriId = Convert.ToInt32(Session["MusteriId"]);
@@ -66,35 +84,40 @@ namespace mvc_full.Controllers
             return View(checkoutModel);
         }
 
-        // معالجة الطلب - إنشاء الطلب في قاعدة البيانات
+        // ═══════════════════════════════════════════════════════════════════
+        // معالجة الطلب - حفظ الطلب في قاعدة البيانات
+        // الرابط: POST /OrderPage/ProcessCheckout
+        // ═══════════════════════════════════════════════════════════════════
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]  // حماية من هجمات CSRF
         public ActionResult ProcessCheckout(CheckoutViewModel model)
         {
             try
             {
                 var cartItems = GetCartItems();
                 
-                // حساب السعر مع الضريبة
+                // حساب السعر النهائي مع الضريبة
                 decimal totalPrice = cartItems.Any() 
                     ? cartItems.Sum(x => x.ToplamFiyat) * 1.08m 
                     : 0m;
 
+                // التحقق: السلة فارغة؟
                 if (totalPrice == 0)
                 {
                     TempData["Error"] = "Sepetiniz bos. Lutfen sepete urun ekleyin.";
                     return RedirectToAction("Index", "Food");
                 }
 
-                // جلب أو إنشاء حساب للطلب
+                // تحديد رقم الزبون
                 int musteriId;
                 if (Session["MusteriId"] != null)
                 {
+                    // مستخدم مسجل
                     musteriId = Convert.ToInt32(Session["MusteriId"]);
                 }
                 else
                 {
-                    // إنشاء حساب مستخدم ضيف للطلبات بدون تسجيل
+                    // مستخدم ضيف - إنشاء حساب مؤقت
                     var guestMusteri = db.Musteriler.FirstOrDefault(m => m.Email == "misafir@trendyol.com");
                     if (guestMusteri == null)
                     {
@@ -114,7 +137,7 @@ namespace mvc_full.Controllers
                     musteriId = guestMusteri.MusteriId;
                 }
 
-                // إنشاء الطلب
+                // إنشاء سجل الطلب في قاعدة البيانات
                 var order = new OrderPage
                 {
                     MusteriId = musteriId,
@@ -122,13 +145,14 @@ namespace mvc_full.Controllers
                     DeliveryAddress = model.Adres ?? "Belirtilmedi",
                     PaymentMethod = model.OdemeYontemi ?? "Kapida Odeme",
                     OrderDate = DateTime.Now,
-                    OrderStatus = "Onaylandi"
+                    OrderStatus = "Onaylandi"  // الحالة الأولية
                 };
 
+                // حفظ في قاعدة البيانات
                 db.OrderPages.Add(order);
                 db.SaveChanges();
 
-                // تفريغ السلة
+                // تفريغ السلة بعد الطلب
                 ClearCart();
 
                 TempData["Message"] = "Siparisiz basariyla alindi! Siparis numaraniz: " + order.OrderId;
@@ -136,40 +160,45 @@ namespace mvc_full.Controllers
             }
             catch (Exception ex)
             {
-                // Get the deepest inner exception for detailed error message
+                // معالجة الأخطاء
                 var innerEx = ex;
                 while (innerEx.InnerException != null)
                 {
                     innerEx = innerEx.InnerException;
                 }
                 
-                // تسجيل الخطأ
                 System.Diagnostics.Debug.WriteLine("Checkout Error: " + innerEx.Message);
-                
                 TempData["Error"] = "Siparis islenirken bir hata olustu. Lutfen tekrar deneyin.";
                 return RedirectToAction("Checkout");
             }
         }
 
-        // إضافة منتج للسلة
+        // ═══════════════════════════════════════════════════════════════════
+        // إضافة منتج للسلة (عادي - مع إعادة تحميل الصفحة)
+        // الرابط: /OrderPage/AddToCart?yemekId=5&miktar=2
+        // ═══════════════════════════════════════════════════════════════════
         public ActionResult AddToCart(int yemekId, int miktar = 1)
         {
             try
             {
+                // جلب بيانات الطعام من قاعدة البيانات
                 var yemek = db.Yemekler.Include(y => y.Restoran).FirstOrDefault(y => y.YemekId == yemekId);
+                
                 if (yemek != null)
                 {
+                    // جلب السلة الحالية
                     var cartItems = GetCartItems();
+                    // البحث عن المنتج في السلة
                     var existingItem = cartItems.FirstOrDefault(x => x.YemekId == yemekId);
 
                     if (existingItem != null)
                     {
-                        // زيادة الكمية
+                        // المنتج موجود = زيادة الكمية فقط
                         existingItem.Miktar += miktar;
                     }
                     else
                     {
-                        // إضافة منتج جديد
+                        // المنتج جديد = إضافته للقائمة
                         cartItems.Add(new CartItemViewModel
                         {
                             YemekId = yemek.YemekId,
@@ -182,6 +211,7 @@ namespace mvc_full.Controllers
                         });
                     }
 
+                    // حفظ السلة في الـ Session
                     SaveCartItems(cartItems);
                     TempData["Message"] = $"{yemek.Ad} sepete eklendi!";
                 }
@@ -198,13 +228,17 @@ namespace mvc_full.Controllers
             return RedirectToAction("Index");
         }
 
-        // إضافة منتج للسلة عبر AJAX
+        // ═══════════════════════════════════════════════════════════════════
+        // إضافة منتج للسلة عبر AJAX (بدون إعادة تحميل الصفحة)
+        // الرابط: POST /OrderPage/AddToCartAjax
+        // ═══════════════════════════════════════════════════════════════════
         [HttpPost]
         public JsonResult AddToCartAjax(int yemekId, int miktar = 1)
         {
             try
             {
                 var yemek = db.Yemekler.Include(y => y.Restoran).FirstOrDefault(y => y.YemekId == yemekId);
+                
                 if (yemek != null)
                 {
                     var cartItems = GetCartItems();
@@ -230,6 +264,7 @@ namespace mvc_full.Controllers
 
                     SaveCartItems(cartItems);
                     
+                    // إرجاع JSON للـ JavaScript
                     return Json(new { 
                         success = true, 
                         message = yemek.Ad + " sepete eklendi",
@@ -246,13 +281,17 @@ namespace mvc_full.Controllers
             }
         }
 
+        // ═══════════════════════════════════════════════════════════════════
         // حذف منتج من السلة
+        // الرابط: /OrderPage/RemoveFromCart?yemekId=5
+        // ═══════════════════════════════════════════════════════════════════
         public ActionResult RemoveFromCart(int yemekId)
         {
             try
             {
                 var cartItems = GetCartItems();
                 var item = cartItems.FirstOrDefault(x => x.YemekId == yemekId);
+                
                 if (item != null)
                 {
                     cartItems.Remove(item);
@@ -272,12 +311,16 @@ namespace mvc_full.Controllers
             return RedirectToAction("Index");
         }
 
+        // ═══════════════════════════════════════════════════════════════════
         // تحديث الكمية عبر AJAX
+        // الرابط: POST /OrderPage/UpdateQuantity
+        // ═══════════════════════════════════════════════════════════════════
         [HttpPost]
         public JsonResult UpdateQuantity(int yemekId, int miktar)
         {
             try
             {
+                // التحقق من صحة الكمية
                 if (miktar <= 0)
                 {
                     return Json(new { success = false, message = "Miktar en az 1 olmalidir" });
@@ -312,7 +355,9 @@ namespace mvc_full.Controllers
             }
         }
 
-        // صفحة تأكيد الطلب
+        // ═══════════════════════════════════════════════════════════════════
+        // صفحة تأكيد الطلب - تظهر بعد إتمام الطلب بنجاح
+        // ═══════════════════════════════════════════════════════════════════
         public ActionResult OrderConfirmation(int id)
         {
             var order = db.OrderPages.FirstOrDefault(o => o.OrderId == id);
@@ -325,7 +370,9 @@ namespace mvc_full.Controllers
             return View(order);
         }
 
+        // ═══════════════════════════════════════════════════════════════════
         // تفريغ السلة بالكامل
+        // ═══════════════════════════════════════════════════════════════════
         public ActionResult ClearCartAction()
         {
             ClearCart();
@@ -333,7 +380,10 @@ namespace mvc_full.Controllers
             return RedirectToAction("Index");
         }
 
-        // عدد العناصر للعرض في النافبار
+        // ═══════════════════════════════════════════════════════════════════
+        // جلب عدد العناصر في السلة (للـ Navbar)
+        // تُستدعى عبر AJAX لتحديث العداد
+        // ═══════════════════════════════════════════════════════════════════
         public JsonResult GetCartCount()
         {
             var cartItems = GetCartItems();
@@ -343,23 +393,30 @@ namespace mvc_full.Controllers
             }, JsonRequestBehavior.AllowGet);
         }
 
-        // معاينة السلة
+        // ═══════════════════════════════════════════════════════════════════
+        // معاينة السلة - جزء صغير يظهر في القائمة المنسدلة
+        // ═══════════════════════════════════════════════════════════════════
         public ActionResult GetCartPreview()
         {
             var cartItems = GetCartItems();
             return PartialView("_CartPreview", cartItems);
         }
 
-        #region دوال مساعدة
+        // ═══════════════════════════════════════════════════════════════════
+        // دوال مساعدة خاصة - للتعامل مع الـ Session
+        // ═══════════════════════════════════════════════════════════════════
+        #region دوال مساعدة للسلة
         
-        // جلب عناصر السلة من الجلسة
+        // جلب عناصر السلة من الـ Session
         private List<CartItemViewModel> GetCartItems()
         {
+            // محاولة جلب السلة من الـ Session
             var cartItems = Session["CartItems"] as List<CartItemViewModel>;
+            // إذا فارغة = نرجع قائمة جديدة فارغة
             return cartItems ?? new List<CartItemViewModel>();
         }
 
-        // حفظ السلة في الجلسة
+        // حفظ السلة في الـ Session
         private void SaveCartItems(List<CartItemViewModel> cartItems)
         {
             Session["CartItems"] = cartItems;
@@ -373,11 +430,14 @@ namespace mvc_full.Controllers
 
         #endregion
 
+        // ═══════════════════════════════════════════════════════════════════
+        // تنظيف الموارد عند إغلاق الكنترولر
+        // ═══════════════════════════════════════════════════════════════════
         protected override void Dispose(bool disposing)
         {
             if (disposing)
             {
-                db.Dispose();
+                db.Dispose();  // إغلاق اتصال قاعدة البيانات
             }
             base.Dispose(disposing);
         }

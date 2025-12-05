@@ -1,3 +1,8 @@
+// ═══════════════════════════════════════════════════════════════════════════════
+// ملف: AccountController.cs
+// الغرض: إدارة حسابات المستخدمين (تسجيل، دخول، خروج، ملف شخصي)
+// الشرح: هذا الكنترولر يتعامل مع كل عمليات المصادقة والتفويض
+// ═══════════════════════════════════════════════════════════════════════════════
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,14 +15,21 @@ using mvc_full.Helpers;
 
 namespace mvc_full.Controllers
 {
-    // Account controller - login, register, profile management
+    // كنترولر الحسابات - تسجيل الدخول والخروج والملف الشخصي
     public class AccountController : Controller
     {
+        // ═══════════════════════════════════════════════════════════════════
+        // الاتصال بقاعدة البيانات
+        // ═══════════════════════════════════════════════════════════════════
         private ABCDbContext db = new ABCDbContext();
 
-        // GET: Register
+        // ═══════════════════════════════════════════════════════════════════
+        // صفحة التسجيل - عرض النموذج (GET)
+        // الرابط: /Account/Register
+        // ═══════════════════════════════════════════════════════════════════
         public ActionResult Register()
         {
+            // إذا مسجل دخول بالفعل = توجيه للرئيسية
             if (Session["MusteriId"] != null)
             {
                 return RedirectToAction("Index", "Home");
@@ -25,15 +37,20 @@ namespace mvc_full.Controllers
             return View();
         }
 
-        // POST: Register
+        // ═══════════════════════════════════════════════════════════════════
+        // معالجة التسجيل - استلام البيانات (POST)
+        // ═══════════════════════════════════════════════════════════════════
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]  // حماية من هجمات CSRF
         public ActionResult Register(RegisterViewModel model)
         {
+            // التحقق من صحة البيانات
             if (ModelState.IsValid)
             {
+                // تحويل الإيميل لحروف صغيرة للمقارنة
                 string email = model.Email?.ToLowerInvariant();
                 
+                // التحقق: هل الإيميل مستخدم من قبل؟
                 var user = db.Musteriler.FirstOrDefault(m => m.Email.ToLower() == email);
                 if (user != null)
                 {
@@ -41,7 +58,7 @@ namespace mvc_full.Controllers
                     return View(model);
                 }
 
-                // Create new user with hashed password
+                // إنشاء مستخدم جديد مع تشفير كلمة المرور
                 var musteri = new Musteri
                 {
                     Ad = model.Ad?.Trim(),
@@ -49,14 +66,15 @@ namespace mvc_full.Controllers
                     Email = email,
                     Telefon = model.Telefon?.Trim(),
                     Adres = model.Adres?.Trim(),
-                    Sifre = SecurityHelper.HashPassword(model.Sifre),
+                    Sifre = SecurityHelper.HashPassword(model.Sifre),  // تشفير!
                     KayitTarihi = DateTime.Now
                 };
 
+                // حفظ في قاعدة البيانات
                 db.Musteriler.Add(musteri);
                 db.SaveChanges();
 
-                // Save session
+                // تسجيل الدخول تلقائياً بعد التسجيل
                 Session["MusteriId"] = musteri.MusteriId;
                 Session["MusteriAd"] = musteri.TamAd;
 
@@ -64,12 +82,17 @@ namespace mvc_full.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
+            // إذا في أخطاء = نعيد عرض النموذج
             return View(model);
         }
 
-        // GET: Login
+        // ═══════════════════════════════════════════════════════════════════
+        // صفحة تسجيل الدخول - عرض النموذج (GET)
+        // الرابط: /Account/Login
+        // ═══════════════════════════════════════════════════════════════════
         public ActionResult Login()
         {
+            // إذا مسجل دخول = توجيه للرئيسية
             if (Session["MusteriId"] != null)
             {
                 return RedirectToAction("Index", "Home");
@@ -77,7 +100,9 @@ namespace mvc_full.Controllers
             return View();
         }
 
-        // POST: Login
+        // ═══════════════════════════════════════════════════════════════════
+        // معالجة تسجيل الدخول (POST)
+        // ═══════════════════════════════════════════════════════════════════
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Login(LoginViewModel model, string returnUrl)
@@ -85,19 +110,20 @@ namespace mvc_full.Controllers
             if (ModelState.IsValid)
             {
                 string email = model.Email?.ToLowerInvariant();
+                // البحث عن المستخدم بالإيميل
                 var musteri = db.Musteriler.FirstOrDefault(m => m.Email.ToLower() == email);
 
                 if (musteri != null)
                 {
-                    // Verify password
+                    // التحقق من كلمة المرور المشفرة
                     if (SecurityHelper.VerifyPassword(model.Sifre, musteri.Sifre))
                     {
-                        // Save session
-                        Session["MusteriId"] = musteri.MusteriId;
-                        Session["MusteriAd"] = musteri.TamAd;
-                        Session["IsAdmin"] = musteri.IsAdmin;
+                        // حفظ بيانات الجلسة
+                        Session["MusteriId"] = musteri.MusteriId;  // رقم المستخدم
+                        Session["MusteriAd"] = musteri.TamAd;      // اسم المستخدم
+                        Session["IsAdmin"] = musteri.IsAdmin;      // هل أدمن؟
 
-                        // Redirect
+                        // التوجيه للصفحة السابقة إن وجدت
                         if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
                         {
                             return Redirect(returnUrl);
@@ -107,21 +133,24 @@ namespace mvc_full.Controllers
                     }
                 }
 
-                // Generic error for security
+                // رسالة خطأ عامة (للأمان - لا نكشف أي البيانات خاطئة)
                 ModelState.AddModelError("", "Email veya sifre hatali");
             }
 
             return View(model);
         }
 
-        // GET: Logout
+        // ═══════════════════════════════════════════════════════════════════
+        // تسجيل الخروج
+        // الرابط: /Account/Logout
+        // ═══════════════════════════════════════════════════════════════════
         public ActionResult Logout()
         {
-            // Clear session
+            // مسح جميع بيانات الجلسة
             Session.Clear();
             Session.Abandon();
             
-            // Clear cookies
+            // مسح الكوكيز
             if (Request.Cookies["ASP.NET_SessionId"] != null)
             {
                 Response.Cookies["ASP.NET_SessionId"].Expires = DateTime.Now.AddDays(-1);
@@ -131,14 +160,19 @@ namespace mvc_full.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        // GET: Profile
+        // ═══════════════════════════════════════════════════════════════════
+        // صفحة الملف الشخصي - عرض البيانات (GET)
+        // الرابط: /Account/Profile
+        // ═══════════════════════════════════════════════════════════════════
         public new ActionResult Profile()
         {
+            // التحقق من تسجيل الدخول
             if (Session["MusteriId"] == null)
             {
                 return RedirectToAction("Login");
             }
 
+            // جلب بيانات المستخدم من قاعدة البيانات
             int musteriId = (int)Session["MusteriId"];
             var musteri = db.Musteriler.Find(musteriId);
 
@@ -151,7 +185,9 @@ namespace mvc_full.Controllers
             return View(musteri);
         }
 
-        // POST: Profile
+        // ═══════════════════════════════════════════════════════════════════
+        // تحديث الملف الشخصي (POST)
+        // ═══════════════════════════════════════════════════════════════════
         [HttpPost]
         [ValidateAntiForgeryToken]
         public new ActionResult Profile(Musteri musteri)
@@ -161,14 +197,14 @@ namespace mvc_full.Controllers
                 return RedirectToAction("Login");
             }
 
-            // Ensure user can only edit own profile
+            // التأكد أن المستخدم يعدل ملفه فقط (أمان)
             int currentUserId = (int)Session["MusteriId"];
             if (musteri.MusteriId != currentUserId)
             {
                 return new HttpStatusCodeResult(403, "Forbidden");
             }
 
-            // Skip password validation if not updating
+            // تخطي التحقق من كلمة المرور إذا لم تُعدَّل
             if (string.IsNullOrEmpty(musteri.Sifre))
             {
                 ModelState.Remove("Sifre");
@@ -179,14 +215,14 @@ namespace mvc_full.Controllers
                 var existingMusteri = db.Musteriler.Find(musteri.MusteriId);
                 if (existingMusteri != null)
                 {
-                    // Update info
+                    // تحديث البيانات
                     existingMusteri.Ad = musteri.Ad?.Trim();
                     existingMusteri.Soyad = musteri.Soyad?.Trim();
                     existingMusteri.Email = musteri.Email?.ToLowerInvariant();
                     existingMusteri.Telefon = musteri.Telefon?.Trim();
                     existingMusteri.Adres = musteri.Adres?.Trim();
 
-                    // Hash password if provided
+                    // تشفير كلمة المرور الجديدة إن وُجدت
                     if (!string.IsNullOrEmpty(musteri.Sifre))
                     {
                         existingMusteri.Sifre = SecurityHelper.HashPassword(musteri.Sifre);
@@ -203,7 +239,10 @@ namespace mvc_full.Controllers
             return View(musteri);
         }
 
-        // GET: Account/Orders
+        // ═══════════════════════════════════════════════════════════════════
+        // عرض طلبات المستخدم
+        // الرابط: /Account/Orders
+        // ═══════════════════════════════════════════════════════════════════
         public ActionResult Orders()
         {
             if (Session["MusteriId"] == null)
@@ -212,6 +251,7 @@ namespace mvc_full.Controllers
             }
 
             int musteriId = (int)Session["MusteriId"];
+            // جلب الطلبات مرتبة من الأحدث للأقدم
             var orders = db.OrderPages.Where(o => o.MusteriId == musteriId)
                                       .OrderByDescending(o => o.OrderDate)
                                       .ToList();
@@ -219,13 +259,17 @@ namespace mvc_full.Controllers
             return View(orders);
         }
 
-        // GET: ForgotPassword
+        // ═══════════════════════════════════════════════════════════════════
+        // صفحة نسيت كلمة المرور (GET)
+        // ═══════════════════════════════════════════════════════════════════
         public ActionResult ForgotPassword()
         {
             return View();
         }
 
-        // POST: ForgotPassword
+        // ═══════════════════════════════════════════════════════════════════
+        // معالجة طلب استعادة كلمة المرور (POST)
+        // ═══════════════════════════════════════════════════════════════════
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult ForgotPassword(string Email)
@@ -241,18 +285,21 @@ namespace mvc_full.Controllers
 
             if (musteri != null)
             {
-                // In real app: send email with reset link
-                TempData["Success"] = "Sifre sifirlama linki e-posta adresinize gonderildi. Lutfen e-postanizi kontrol edin.";
+                // في التطبيق الحقيقي: إرسال إيميل مع رابط إعادة التعيين
+                TempData["Success"] = "Sifre sifirlama linki e-posta adresinize gonderildi.";
             }
             else
             {
-                // Don't reveal if email exists
-                TempData["Success"] = "Eger bu e-posta adresi sistemimizde kayitliysa, sifre sifirlama linki gonderilecektir.";
+                // لا نكشف إذا كان الإيميل موجوداً أم لا (أمان)
+                TempData["Success"] = "Eger bu e-posta adresi kayitliysa, link gonderilecektir.";
             }
 
             return View();
         }
 
+        // ═══════════════════════════════════════════════════════════════════
+        // تنظيف الموارد
+        // ═══════════════════════════════════════════════════════════════════
         protected override void Dispose(bool disposing)
         {
             if (disposing)
