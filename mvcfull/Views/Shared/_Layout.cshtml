@@ -82,10 +82,14 @@
                     @if (Session["MusteriId"] != null)
                     {
                         <li class="nav-item dropdown">
+                            @{
+                                var cartItems = Session["CartItems"] as List<mvc_full.Models.CartItemViewModel>;
+                                int sepetCount = cartItems != null ? cartItems.Sum(x => x.Miktar) : 0;
+                            }
                             <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
                                 <i class="fas fa-shopping-cart me-2"></i>
                                 Sepet
-                                <span class="badge bg-warning text-dark ms-1" id="cart-count">0</span>
+                                <span class="badge bg-warning text-dark ms-1" id="cart-count">@sepetCount</span>
                             </a>
                             <div class="dropdown-menu dropdown-menu-end p-3" style="min-width: 320px;" id="cart-preview-dropdown">
                                 <div id="cart-preview">
