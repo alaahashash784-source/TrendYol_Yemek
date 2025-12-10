@@ -1,0 +1,232 @@
+@model IEnumerable<mvc_full.Models.OrderPage>
+
+@{
+    ViewBag.Title = "Siparisler";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .admin-header {
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        color: white;
+        padding: 30px 0;
+        margin-bottom: 30px;
+    }
+    .status-badge {
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+    .status-pending { background-color: #fff3cd; color: #856404; }
+    .status-preparing { background-color: #cce5ff; color: #004085; }
+    .status-onway { background-color: #d4edda; color: #155724; }
+    .status-delivered { background-color: #d1ecf1; color: #0c5460; }
+    .status-cancelled { background-color: #f8d7da; color: #721c24; }
+</style>
+
+<div class="admin-header">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1><i class="fas fa-shopping-cart me-3"></i>Siparisler</h1>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index", "Admin")" class="text-white-50">Admin</a></li>
+                        <li class="breadcrumb-item active text-white">Siparisler</li>
+                    </ol>
+                </nav>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <a href="@Url.Action("ExportOrdersCsv", "Admin")" class="btn btn-success">
+                    <i class="fas fa-file-csv me-1"></i>CSV Indir
+                </a>
+                <span class="badge bg-light text-dark fs-5">@Model.Count() Siparis</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    @if (TempData["Message"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>@TempData["Message"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Filter Buttons -->
+    <div class="mb-4">
+        <div class="btn-group" role="group">
+            <button type="button" class="btn btn-secondary active" data-filter="all">Tumu</button>
+            <button type="button" class="btn btn-outline-warning" data-filter="Beklemede">Beklemede</button>
+            <button type="button" class="btn btn-outline-success" data-filter="Onaylandi">Onaylandi</button>
+            <button type="button" class="btn btn-outline-primary" data-filter="Hazirlaniyor">Hazirlaniyor</button>
+            <button type="button" class="btn btn-outline-info" data-filter="Yolda">Yolda</button>
+            <button type="button" class="btn btn-outline-dark" data-filter="Teslim Edildi">Teslim Edildi</button>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Siparis No</th>
+                            <th>Musteri</th>
+                            <th>Adres</th>
+                            <th>Toplam</th>
+                            <th>Tarih</th>
+                            <th>Durum</th>
+                            <th>Islemler</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ordersTable">
+                        @foreach (var order in Model)
+                        {
+                            string statusClass = "status-pending";
+                            string orderStatus = order.OrderStatus ?? "Onaylandi";
+                            if (orderStatus == "Hazirlaniyor") { statusClass = "status-preparing"; }
+                            else if (orderStatus == "Yolda") { statusClass = "status-onway"; }
+                            else if (orderStatus == "Teslim Edildi") { statusClass = "status-delivered"; }
+                            else if (orderStatus == "Iptal") { statusClass = "status-cancelled"; }
+                            else if (orderStatus == "Onaylandi") { statusClass = "status-pending"; }
+                            
+                            <tr data-status="@orderStatus">
+                                <td>
+                                    <strong>#@order.OrderId</strong>
+                                </td>
+                                <td>
+                                    <i class="fas fa-user text-muted me-1"></i>
+                                    Musteri #@order.MusteriId
+                                </td>
+                                <td>
+                                    <small>
+                                        <i class="fas fa-map-marker-alt text-danger me-1"></i>
+                                        @if (!string.IsNullOrEmpty(order.DeliveryAddress) && order.DeliveryAddress.Length > 30)
+                                        {
+                                            @(order.DeliveryAddress.Substring(0, 30) + "...")
+                                        }
+                                        else
+                                        {
+                                            @(order.DeliveryAddress ?? "Belirtilmemis")
+                                        }
+                                    </small>
+                                </td>
+                                <td>
+                                    <strong class="text-success">@order.TotalPrice.ToString("N2") TL</strong>
+                                </td>
+                                <td>
+                                    <small>
+                                        <i class="fas fa-calendar text-muted me-1"></i>
+                                        @order.OrderDate.ToString("dd.MM.yyyy HH:mm")
+                                    </small>
+                                </td>
+                                <td>
+                                    <span class="status-badge @statusClass">
+                                        @orderStatus
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                                            Durum Guncelle
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                <form action="@Url.Action("UpdateOrderStatus", "Admin")" method="post" style="display:inline;">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="orderId" value="@order.OrderId" />
+                                                    <input type="hidden" name="status" value="Beklemede" />
+                                                    <button type="submit" class="dropdown-item">
+                                                        <i class="fas fa-clock text-warning me-2"></i>Beklemede
+                                                    </button>
+                                                </form>
+                                            </li>
+                                            <li>
+                                                <form action="@Url.Action("UpdateOrderStatus", "Admin")" method="post" style="display:inline;">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="orderId" value="@order.OrderId" />
+                                                    <input type="hidden" name="status" value="Hazirlaniyor" />
+                                                    <button type="submit" class="dropdown-item">
+                                                        <i class="fas fa-fire text-primary me-2"></i>Hazirlaniyor
+                                                    </button>
+                                                </form>
+                                            </li>
+                                            <li>
+                                                <form action="@Url.Action("UpdateOrderStatus", "Admin")" method="post" style="display:inline;">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="orderId" value="@order.OrderId" />
+                                                    <input type="hidden" name="status" value="Yolda" />
+                                                    <button type="submit" class="dropdown-item">
+                                                        <i class="fas fa-motorcycle text-info me-2"></i>Yolda
+                                                    </button>
+                                                </form>
+                                            </li>
+                                            <li>
+                                                <form action="@Url.Action("UpdateOrderStatus", "Admin")" method="post" style="display:inline;">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="orderId" value="@order.OrderId" />
+                                                    <input type="hidden" name="status" value="Teslim Edildi" />
+                                                    <button type="submit" class="dropdown-item">
+                                                        <i class="fas fa-check-circle text-success me-2"></i>Teslim Edildi
+                                                    </button>
+                                                </form>
+                                            </li>
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li>
+                                                <form action="@Url.Action("UpdateOrderStatus", "Admin")" method="post" style="display:inline;">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="orderId" value="@order.OrderId" />
+                                                    <input type="hidden" name="status" value="Iptal" />
+                                                    <button type="submit" class="dropdown-item text-danger">
+                                                        <i class="fas fa-times-circle me-2"></i>Iptal Et
+                                                    </button>
+                                                </form>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="text-center py-5">
+            <i class="fas fa-shopping-cart fa-4x text-muted mb-3"></i>
+            <h4 class="text-muted">Henuz siparis yok</h4>
+        </div>
+    }
+
+    <div class="mt-4">
+        <a href="@Url.Action("Index", "Admin")" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Admin Paneline Don
+        </a>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        $(document).ready(function() {
+            $('[data-filter]').click(function() {
+                var filter = $(this).data('filter');
+                $('[data-filter]').removeClass('active');
+                $(this).addClass('active');
+                
+                if (filter === 'all') {
+                    $('#ordersTable tr').show();
+                } else {
+                    $('#ordersTable tr').hide();
+                    $('#ordersTable tr[data-status="' + filter + '"]').show();
+                }
+            });
+        });
+    </script>
+}

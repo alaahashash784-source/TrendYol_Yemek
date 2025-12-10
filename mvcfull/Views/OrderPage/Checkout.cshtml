@@ -1,0 +1,346 @@
+﻿@*
+    صفحة الدفع وإتمام الطلب - نموذج إدخال بيانات الدفع
+    Controller: OrderPageController.cs → Action: Checkout()
+    الربط: Html.BeginForm يرسل POST لحفظ الطلب والانتقال لصفحة التأكيد
+*@
+@model mvc_full.Models.CheckoutViewModel
+
+@{
+    ViewBag.Title = "Odeme";
+}
+
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold text-primary">
+            <i class="fas fa-credit-card me-3"></i>Odeme
+        </h1>
+        <p class="lead text-muted">Siparisinizi tamamlayin</p>
+        
+        <!-- Progress Steps -->
+        <div class="d-flex justify-content-center mt-4">
+            <div class="d-flex align-items-center">
+                <span class="badge bg-success rounded-circle p-2"><i class="fas fa-check"></i></span>
+                <span class="text-success ms-2 me-3">Sepet</span>
+                <div class="border-top border-success" style="width: 50px;"></div>
+                <span class="badge bg-primary rounded-circle p-2">2</span>
+                <span class="text-primary ms-2 me-3">Odeme</span>
+                <div class="border-top border-secondary" style="width: 50px;"></div>
+                <span class="badge bg-secondary rounded-circle p-2">3</span>
+                <span class="text-secondary ms-2">Onay</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            @using (Html.BeginForm("ProcessCheckout", "OrderPage", FormMethod.Post, new { id = "checkoutForm" }))
+            {
+                @Html.AntiForgeryToken()
+                
+                <!-- Teslimat Adresi -->
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-map-marker-alt me-2"></i>Teslimat Bilgileri</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Ad Soyad *</label>
+                                @Html.TextBox("AdSoyad", (Model != null ? Model.AdSoyad : ""), new { @class = "form-control form-control-lg", placeholder = "Adiniz Soyadiniz", required = "required" })
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Telefon *</label>
+                                @Html.TextBox("Telefon", (Model != null ? Model.Telefon : ""), new { @class = "form-control form-control-lg", type = "tel", placeholder = "0555 555 5555", required = "required" })
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Teslimat Adresi *</label>
+                            @Html.TextArea("Adres", (Model != null ? Model.Adres : ""), new { @class = "form-control", rows = "3", placeholder = "Mahalle, Sokak, Bina No, Daire No...", required = "required" })
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Siparis Notu</label>
+                            <textarea class="form-control" name="SiparisNotu" rows="2" 
+                                      placeholder="Ozel istekleriniz (zil calma, kapiyi vur vb.)"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Odeme Yontemi -->
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0"><i class="fas fa-credit-card me-2"></i>Odeme Yontemi</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <!-- Odeme Secenekleri -->
+                        <div class="row mb-4">
+                            <div class="col-md-4 mb-3">
+                                <input type="radio" class="btn-check" name="OdemeYontemi" value="Nakit" id="nakit" checked>
+                                <label class="btn btn-outline-secondary w-100 py-3" for="nakit">
+                                    <i class="fas fa-money-bill-wave fa-2x mb-2 d-block text-success"></i>
+                                    <strong>Kapida Nakit</strong>
+                                </label>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <input type="radio" class="btn-check" name="OdemeYontemi" value="KapidaKart" id="kapidaKart">
+                                <label class="btn btn-outline-secondary w-100 py-3" for="kapidaKart">
+                                    <i class="fas fa-credit-card fa-2x mb-2 d-block text-primary"></i>
+                                    <strong>Kapida Kart</strong>
+                                </label>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <input type="radio" class="btn-check" name="OdemeYontemi" value="OnlineKart" id="onlineKart">
+                                <label class="btn btn-outline-secondary w-100 py-3" for="onlineKart">
+                                    <i class="fas fa-lock fa-2x mb-2 d-block text-warning"></i>
+                                    <strong>Online Odeme</strong>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Online Kart Formu -->
+                        <div id="kartBilgileri" class="card bg-light border-0 p-4" style="display: none;">
+                            <h6 class="mb-3"><i class="fas fa-shield-alt text-success me-2"></i>Guvenli Odeme</h6>
+                            
+                            <!-- Kart Gorseli -->
+                            <div class="credit-card-preview mb-4">
+                                <div class="card bg-gradient text-white p-4 rounded-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); max-width: 400px;">
+                                    <div class="d-flex justify-content-between mb-4">
+                                        <i class="fab fa-cc-visa fa-2x"></i>
+                                        <i class="fas fa-wifi fa-rotate-90"></i>
+                                    </div>
+                                    <div class="card-number mb-3 fs-5 letter-spacing-2" id="previewCardNumber">
+                                        •••• •••• •••• ••••
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <div>
+                                            <small class="opacity-75">Kart Sahibi</small>
+                                            <div id="previewCardName">AD SOYAD</div>
+                                        </div>
+                                        <div>
+                                            <small class="opacity-75">Son Kullanma</small>
+                                            <div id="previewCardExpiry">MM/YY</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-12 mb-3">
+                                    <label class="form-label fw-bold">Kart Uzerindeki Isim</label>
+                                    <input type="text" class="form-control form-control-lg" id="kartIsim" name="KartIsim" 
+                                           placeholder="ADINIZ SOYADINIZ" style="text-transform: uppercase;">
+                                </div>
+                                <div class="col-12 mb-3">
+                                    <label class="form-label fw-bold">Kart Numarasi</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-credit-card"></i></span>
+                                        <input type="text" class="form-control form-control-lg" id="kartNumarasi" name="KartNumarasi" 
+                                               placeholder="1234 5678 9012 3456" maxlength="19">
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Son Kullanma Tarihi</label>
+                                    <input type="text" class="form-control form-control-lg" id="kartTarih" name="KartTarih" 
+                                           placeholder="AA/YY" maxlength="5">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">CVV/CVC</label>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control form-control-lg" id="kartCvv" name="KartCvv" 
+                                               placeholder="•••" maxlength="4">
+                                        <span class="input-group-text" data-bs-toggle="tooltip" title="Kartinizin arkasindaki 3 haneli kod">
+                                            <i class="fas fa-question-circle"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Guvenlik Bilgisi -->
+                            <div class="alert alert-info mb-0">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-lock fa-2x me-3 text-primary"></i>
+                                    <div>
+                                        <strong>256-bit SSL Guvenlik</strong>
+                                        <p class="mb-0 small">Kart bilgileriniz en yuksek guvenlik standartlariyla korunmaktadir.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Kabul Edilen Kartlar -->
+                        <div class="mt-4 text-center">
+                            <small class="text-muted">Kabul edilen kartlar:</small>
+                            <div class="d-flex justify-content-center gap-3 mt-2">
+                                <i class="fab fa-cc-visa fa-2x text-primary"></i>
+                                <i class="fab fa-cc-mastercard fa-2x text-danger"></i>
+                                <i class="fab fa-cc-amex fa-2x text-info"></i>
+                                <span class="badge bg-secondary fs-6" style="height: 28px; line-height: 20px;">TROY</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="d-grid mb-4">
+                    <button type="submit" class="btn btn-success btn-lg py-3" id="submitBtn">
+                        <i class="fas fa-lock me-2"></i>
+                        <span id="btnText">Siparisi Onayla</span>
+                        <span id="btnSpinner" class="spinner-border spinner-border-sm ms-2" style="display: none;"></span>
+                    </button>
+                </div>
+            }
+        </div>
+        
+        <!-- Siparis Ozeti -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 sticky-top" style="top: 100px;">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0"><i class="fas fa-receipt me-2"></i>Siparis Ozeti</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model != null && Model.SepetUrunleri != null)
+                    {
+                        foreach (var item in Model.SepetUrunleri)
+                        {
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div class="d-flex align-items-center">
+                                    <img src="@item.ResimUrl" alt="@item.YemekAdi" class="rounded" 
+                                         style="width: 50px; height: 50px; object-fit: cover;"
+                                         onerror="this.src='https://via.placeholder.com/50'">
+                                    <div class="ms-3">
+                                        <strong>@item.YemekAdi</strong>
+                                        <small class="d-block text-muted">x @item.Miktar</small>
+                                    </div>
+                                </div>
+                                <span class="fw-bold">@item.ToplamFiyat.ToString("F2") TL</span>
+                            </div>
+                        }
+                        <hr>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Ara Toplam:</span>
+                            <span>@Model.AraToplam.ToString("F2") TL</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">KDV (%8):</span>
+                            <span>@Model.KDV.ToString("F2") TL</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Teslimat:</span>
+                            <span class="text-success fw-bold">Ucretsiz</span>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between">
+                            <span class="fw-bold fs-5">Toplam:</span>
+                            <span class="fw-bold fs-4 text-success">@Model.GenelToplam.ToString("F2") TL</span>
+                        </div>
+                    }
+                </div>
+                <div class="card-footer bg-light">
+                    <div class="d-flex align-items-center text-muted small">
+                        <i class="fas fa-truck me-2"></i>
+                        Tahmini teslimat: 30-45 dakika
+                    </div>
+                </div>
+            </div>
+
+            <!-- Guvenlik Badges -->
+            <div class="card border-0 mt-3">
+                <div class="card-body text-center">
+                    <div class="row">
+                        <div class="col-4">
+                            <i class="fas fa-shield-alt fa-2x text-success mb-2"></i>
+                            <small class="d-block text-muted">Guvenli Odeme</small>
+                        </div>
+                        <div class="col-4">
+                            <i class="fas fa-undo fa-2x text-primary mb-2"></i>
+                            <small class="d-block text-muted">Kolay Iade</small>
+                        </div>
+                        <div class="col-4">
+                            <i class="fas fa-headset fa-2x text-warning mb-2"></i>
+                            <small class="d-block text-muted">7/24 Destek</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+$(document).ready(function() {
+    // Online odeme secildiginde kart formunu goster
+    $('input[name="OdemeYontemi"]').change(function() {
+        if ($(this).val() === 'OnlineKart') {
+            $('#kartBilgileri').slideDown();
+            $('#kartNumarasi, #kartTarih, #kartCvv, #kartIsim').attr('required', true);
+        } else {
+            $('#kartBilgileri').slideUp();
+            $('#kartNumarasi, #kartTarih, #kartCvv, #kartIsim').attr('required', false);
+        }
+    });
+
+    // Kart numarasi formatlama
+    $('#kartNumarasi').on('input', function() {
+        var value = $(this).val().replace(/\s/g, '').replace(/\D/g, '');
+        var formatted = value.match(/.{1,4}/g)?.join(' ') || '';
+        $(this).val(formatted);
+        
+        // Preview guncelle
+        $('#previewCardNumber').text(formatted || '•••• •••• •••• ••••');
+        
+        // Kart tipini belirle
+        if (value.startsWith('4')) {
+            $('.fa-cc-visa').addClass('text-primary').siblings().removeClass('text-primary text-danger text-info');
+        } else if (value.startsWith('5')) {
+            $('.fa-cc-mastercard').addClass('text-danger').siblings().removeClass('text-primary text-danger text-info');
+        } else if (value.startsWith('3')) {
+            $('.fa-cc-amex').addClass('text-info').siblings().removeClass('text-primary text-danger text-info');
+        }
+    });
+
+    // Son kullanma tarihi formatlama
+    $('#kartTarih').on('input', function() {
+        var value = $(this).val().replace(/\D/g, '');
+        if (value.length >= 2) {
+            value = value.substring(0,2) + '/' + value.substring(2);
+        }
+        $(this).val(value);
+        $('#previewCardExpiry').text(value || 'MM/YY');
+    });
+
+    // Kart ismi
+    $('#kartIsim').on('input', function() {
+        $('#previewCardName').text($(this).val().toUpperCase() || 'AD SOYAD');
+    });
+
+    // CVV sadece rakam
+    $('#kartCvv').on('input', function() {
+        $(this).val($(this).val().replace(/\D/g, ''));
+    });
+
+    // Form submit
+    $('#checkoutForm').on('submit', function() {
+        $('#submitBtn').prop('disabled', true);
+        $('#btnText').text('Islem Yapiliyor...');
+        $('#btnSpinner').show();
+    });
+
+    // Tooltip
+    $('[data-bs-toggle="tooltip"]').tooltip();
+});
+</script>
+}
+
+<style>
+.btn-check:checked + .btn-outline-secondary {
+    background-color: #198754;
+    border-color: #198754;
+    color: white;
+}
+.letter-spacing-2 {
+    letter-spacing: 3px;
+}
+.credit-card-preview .card {
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+</style>

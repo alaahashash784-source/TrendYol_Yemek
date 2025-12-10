@@ -1,0 +1,152 @@
+﻿@*
+    صفحة معلومات عن الشركة - تعرض رؤية ورسالة الشركة
+    Controller: HomeController.cs → Action: About()
+    الربط: Html.ActionLink ينتقل إلى Food/Index لاستكشاف الأطعمة
+*@
+@{
+    ViewBag.Title = "Hakkimizda";
+}
+
+<div class="about-page">
+    <!-- Hero Section -->
+    <section class="about-hero text-center py-5" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+        <div class="container">
+            <h1 class="display-4 fw-bold text-white mb-3">
+                <i class="fas fa-utensils me-3"></i>TrendYol Yemek
+            </h1>
+            <p class="lead text-white-50">En lezzetli yemekleri kapiniza getiriyoruz!</p>
+        </div>
+    </section>
+
+    <!-- About Content -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row align-items-center mb-5">
+                <div class="col-lg-6 mb-4">
+                    <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600" 
+                         class="img-fluid rounded-4 shadow-lg" alt="Lezzetli Yemekler">
+                </div>
+                <div class="col-lg-6">
+                    <h2 class="fw-bold text-primary mb-4">
+                        <i class="fas fa-info-circle me-2"></i>Biz Kimiz?
+                    </h2>
+                    <p class="lead text-muted">
+                        TrendYol Yemek, 2025 yilinda kurulan Turkiye'nin onde gelen yemek siparis platformudur.
+                    </p>
+                    <p class="text-muted">
+                        Yuzlerce restoran ortakligi ile kebaptan pizzaya, her damak tadina uygun secenekler sunuyoruz.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="row text-center mb-5">
+                <div class="col-md-3 mb-4">
+                    <div class="card border-0 shadow-sm h-100 py-4">
+                        <div class="card-body">
+                            <i class="fas fa-store fa-3x text-primary mb-3"></i>
+                            <h2 class="fw-bold text-primary">500+</h2>
+                            <p class="text-muted mb-0">Restoran Ortagi</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <div class="card border-0 shadow-sm h-100 py-4">
+                        <div class="card-body">
+                            <i class="fas fa-users fa-3x text-success mb-3"></i>
+                            <h2 class="fw-bold text-success">100K+</h2>
+                            <p class="text-muted mb-0">Mutlu Musteri</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <div class="card border-0 shadow-sm h-100 py-4">
+                        <div class="card-body">
+                            <i class="fas fa-motorcycle fa-3x text-warning mb-3"></i>
+                            <h2 class="fw-bold text-warning">30 dk</h2>
+                            <p class="text-muted mb-0">Ortalama Teslimat</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <div class="card border-0 shadow-sm h-100 py-4">
+                        <div class="card-body">
+                            <i class="fas fa-city fa-3x text-info mb-3"></i>
+                            <h2 class="fw-bold text-info">81</h2>
+                            <p class="text-muted mb-0">Sehirde Hizmet</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mission -->
+            <div class="row mb-5">
+                <div class="col-lg-6 mb-4">
+                    <div class="card border-0 shadow-sm h-100" style="border-left: 4px solid #667eea !important;">
+                        <div class="card-body p-4">
+                            <h4 class="fw-bold text-primary mb-3">
+                                <i class="fas fa-bullseye me-2"></i>Misyonumuz
+                            </h4>
+                            <p class="text-muted mb-0">
+                                Musterilerimize en kaliteli yemekleri, en uygun fiyatlarla ve 
+                                en hizli teslimat ile sunmak. Yemek siparis deneyimini kolaylastirmak 
+                                ve herkes icin erisilebilir kilmak.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 mb-4">
+                    <div class="card border-0 shadow-sm h-100" style="border-left: 4px solid #764ba2 !important;">
+                        <div class="card-body p-4">
+                            <h4 class="fw-bold text-primary mb-3">
+                                <i class="fas fa-eye me-2"></i>Vizyonumuz
+                            </h4>
+                            <p class="text-muted mb-0">
+                                Turkiye'nin en buyuk yemek siparis platformu olmak ve teknoloji ile sektore yon vermek.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Values -->
+            <div class="text-center mb-5">
+                <h3 class="fw-bold text-primary mb-4">
+                    <i class="fas fa-heart me-2"></i>Degerlerimiz
+                </h3>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div class="p-4">
+                            <i class="fas fa-check-circle fa-2x text-success mb-3"></i>
+                            <h5 class="fw-bold">Kalite</h5>
+                            <p class="text-muted small">En kaliteli malzemeler ve ozenli hazirlama</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="p-4">
+                            <i class="fas fa-clock fa-2x text-primary mb-3"></i>
+                            <h5 class="fw-bold">Hiz</h5>
+                            <p class="text-muted small">30 dakika icerisinde sicak teslimat</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="p-4">
+                            <i class="fas fa-smile fa-2x text-warning mb-3"></i>
+                            <h5 class="fw-bold">Musteri Memnuniyeti</h5>
+                            <p class="text-muted small">7/24 destek ve kolay iade</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CTA -->
+            <div class="text-center py-5 rounded-4" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                <h3 class="text-white fw-bold mb-3">Hemen Siparis Verin!</h3>
+                <p class="text-white-50 mb-4">Lezzetli yemekler bir tik uzaginizda</p>
+                <a href="@Url.Action("Index", "Food")" class="btn btn-light btn-lg px-5">
+                    <i class="fas fa-utensils me-2"></i>Yemekleri Kesfet
+                </a>
+            </div>
+        </div>
+    </section>
+</div>

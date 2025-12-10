@@ -1,0 +1,36 @@
+﻿@model IEnumerable<mvc_full.Models.CartItemViewModel>
+
+@if (Model != null && Model.Any())
+{
+    <div class="cart-preview-items">
+        @foreach (var item in Model.Take(3))
+        {
+            <div class="d-flex align-items-center mb-2 pb-2 border-bottom">
+                <img src="@(string.IsNullOrEmpty(item.ResimUrl) ? "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=50" : item.ResimUrl)" 
+                     class="rounded me-2" style="width: 40px; height: 40px; object-fit: cover;" alt="@item.YemekAdi">
+                <div class="flex-grow-1">
+                    <small class="fw-bold d-block">@item.YemekAdi</small>
+                    <small class="text-muted">@item.Miktar x @item.Fiyat.ToString("F2") TL</small>
+                </div>
+                <small class="fw-bold text-primary">@item.ToplamFiyat.ToString("F2") TL</small>
+            </div>
+        }
+        @if (Model.Count() > 3)
+        {
+            <small class="text-muted d-block text-center">ve @(Model.Count() - 3) urun daha...</small>
+        }
+        <div class="mt-2 pt-2 border-top">
+            <div class="d-flex justify-content-between">
+                <span class="fw-bold">Toplam:</span>
+                <span class="fw-bold text-success">@Model.Sum(x => x.ToplamFiyat).ToString("F2") TL</span>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="text-center p-3">
+        <i class="fas fa-shopping-cart fa-2x text-muted mb-2"></i>
+        <p class="text-muted mb-0">Sepetiniz bos</p>
+    </div>
+}

@@ -1,0 +1,64 @@
+@model mvc_full.Models.Restoran
+
+@{
+    ViewBag.Title = "Restoran Sil";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-danger text-white py-4">
+                    <h3 class="mb-0 text-center">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Restoran Silme Onayı
+                    </h3>
+                </div>
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-store fa-4x text-danger mb-3"></i>
+                        <h4 class="fw-bold">@Model.Ad</h4>
+                        <p class="text-muted">@Model.Aciklama</p>
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        <strong>Dikkat!</strong> Bu restoranı silmek istediğinizden emin misiniz?
+                        <br>
+                        <small>Bu işlem geri alınamaz ve restorana ait tüm yemekler de silinecektir.</small>
+                    </div>
+
+                    <div class="card bg-light border-0 mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title mb-3">Restoran Bilgileri</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>ID:</strong> @Model.RestoranId</p>
+                                    <p><strong>Ad:</strong> @Model.Ad</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Açıklama:</strong> @(Model.Aciklama ?? "Belirtilmemiş")</p>
+                                    <p><strong>Adres:</strong> @(Model.Adres ?? "Belirtilmemiş")</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @using (Html.BeginForm("Delete", "Restaurant", FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="@Url.Action("Index")" class="btn btn-secondary btn-lg">
+                                <i class="fas fa-arrow-left me-2"></i>Geri Dön
+                            </a>
+                            <button type="submit" class="btn btn-danger btn-lg">
+                                <i class="fas fa-trash me-2"></i>Evet, Sil
+                            </button>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,341 @@
+@*
+    صفحة إنشاء حساب جديد - نموذج تسجيل المستخدم
+    Controller: AccountController.cs → Action: Register()
+    الربط: Html.BeginForm يرسل POST إلى Account/Register لحفظ المستخدم في DB
+*@
+@model mvc_full.Models.ViewModels.RegisterViewModel
+
+@{
+    ViewBag.Title = "Yeni Hesap Oluştur";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="register-page min-vh-100 py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-md-10">
+                <div class="register-card card shadow-2xl border-0 overflow-hidden">
+                    <div class="card-header bg-gradient-success text-white text-center py-4">
+                        <div class="register-icon mb-3">
+                            <i class="fas fa-user-plus fa-4x"></i>
+                        </div>
+                        <h3 class="mb-0 fw-bold">Hoşgeldiniz! TrendYol Yemek</h3>
+                        <p class="mb-0 opacity-75">Hemen üye olun ve lezzetli yemeklerin keyfini çıkarın</p>
+                    </div>
+
+                    <div class="card-body p-5">
+                        @using (Html.BeginForm("Register", "Account", FormMethod.Post, new { @class = "register-form" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+
+                            <div class="row g-4">
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        @Html.EditorFor(m => m.Ad, new { htmlAttributes = new { @class = "form-control", @placeholder = "Adınızı girin", id = "floatingFirstName" } })
+                                        <label for="floatingFirstName" class="text-muted">
+                                            <i class="fas fa-user me-2"></i>Adınız *
+                                        </label>
+                                        @Html.ValidationMessageFor(m => m.Ad, "", new { @class = "text-danger small" })
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        @Html.EditorFor(m => m.Soyad, new { htmlAttributes = new { @class = "form-control", @placeholder = "Soyadınızı girin", id = "floatingLastName" } })
+                                        <label for="floatingLastName" class="text-muted">
+                                            <i class="fas fa-user me-2"></i>Soyadınız *
+                                        </label>
+                                        @Html.ValidationMessageFor(m => m.Soyad, "", new { @class = "text-danger small" })
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="form-floating">
+                                        @Html.EditorFor(m => m.Email, new { htmlAttributes = new { @class = "form-control", @placeholder = "E-posta adresiniz", id = "floatingEmail" } })
+                                        <label for="floatingEmail" class="text-muted">
+                                            <i class="fas fa-envelope me-2"></i>E-posta Adresiniz *
+                                        </label>
+                                        @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger small" })
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        @Html.EditorFor(m => m.Telefon, new { htmlAttributes = new { @class = "form-control", @placeholder = "Telefon numarası", id = "floatingPhone" } })
+                                        <label for="floatingPhone" class="text-muted">
+                                            <i class="fas fa-phone me-2"></i>Telefon Numarası
+                                        </label>
+                                        @Html.ValidationMessageFor(m => m.Telefon, "", new { @class = "text-danger small" })
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        @Html.EditorFor(m => m.Adres, new { htmlAttributes = new { @class = "form-control", @placeholder = "Adresiniz", id = "floatingAddress" } })
+                                        <label for="floatingAddress" class="text-muted">
+                                            <i class="fas fa-map-marker-alt me-2"></i>Adresiniz
+                                        </label>
+                                        @Html.ValidationMessageFor(m => m.Adres, "", new { @class = "text-danger small" })
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-floating position-relative">
+                                        @Html.PasswordFor(m => m.Sifre, new { @class = "form-control", @placeholder = "Şifrenizi girin", id = "floatingPassword" })
+                                        <label for="floatingPassword" class="text-muted">
+                                            <i class="fas fa-lock me-2"></i>Şifreniz *
+                                        </label>
+                                        <div class="password-strength-meter mt-1">
+                                            <div class="progress" style="height: 4px;">
+                                                <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+                                            </div>
+                                            <small class="password-strength-text text-muted"></small>
+                                        </div>
+                                        @Html.ValidationMessageFor(m => m.Sifre, "", new { @class = "text-danger small" })
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        @Html.PasswordFor(m => m.SifreTekrar, new { @class = "form-control", @placeholder = "Şifrenizi tekrar girin", id = "floatingConfirmPassword" })
+                                        <label for="floatingConfirmPassword" class="text-muted">
+                                            <i class="fas fa-lock me-2"></i>Şifre Tekrarı *
+                                        </label>
+                                        @Html.ValidationMessageFor(m => m.SifreTekrar, "", new { @class = "text-danger small" })
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="agreeToTerms" required>
+                                        <label class="form-check-label text-muted" for="agreeToTerms">
+                                            Kabul ediyorum
+                                            <a href="#" class="text-primary text-decoration-none">Kullanım Koşulları</a>
+                                            ve
+                                            <a href="#" class="text-primary text-decoration-none">Gizlilik Politikası</a>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="marketingEmails">
+                                        <label class="form-check-label text-muted" for="marketingEmails">
+                                            Kampanyalardan haberdar olmak için e-posta almak istiyorum.
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="d-grid">
+                                        <button type="submit" class="btn btn-success btn-lg py-3 fw-bold">
+                                            <i class="fas fa-user-plus me-2"></i>Hesap Oluştur
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+                        <div class="text-center mt-4">
+                            <p class="text-muted mb-0">
+                                Zaten hesabınız var mı?
+                                @Html.ActionLink("Giriş Yapın", "Login", new { }, new { @class = "text-success text-decoration-none fw-bold" })
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="card-footer bg-light">
+                        <div class="row text-center py-3">
+                            <div class="col-md-4 mb-3 mb-md-0">
+                                <i class="fas fa-gift text-success fa-2x mb-2"></i>
+                                <h6 class="fw-bold text-success">Hoşgeldin İndirimi</h6>
+                                <small class="text-muted">İlk siparişinizde %20 indirim</small>
+                            </div>
+                            <div class="col-md-4 mb-3 mb-md-0">
+                                <i class="fas fa-star text-warning fa-2x mb-2"></i>
+                                <h6 class="fw-bold text-warning">Puan Kazan</h6>
+                                <small class="text-muted">Her siparişte puan kazan ve kullan</small>
+                            </div>
+                            <div class="col-md-4">
+                                <i class="fas fa-shipping-fast text-primary fa-2x mb-2"></i>
+                                <h6 class="fw-bold text-primary">Hızlı Teslimat</h6>
+                                <small class="text-muted">Ücretsiz kargo 50 TL ve üzeri</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script>
+        $(document).ready(function () {
+            // Password strength checker
+            $('#floatingPassword').on('input', function () {
+                var password = $(this).val();
+                var strength = getPasswordStrength(password);
+                var progressBar = $('.password-strength-meter .progress-bar');
+                var strengthText = $('.password-strength-text');
+
+                progressBar.css('width', strength.percentage + '%')
+                    .removeClass('bg-danger bg-warning bg-success')
+                    .addClass(strength.class);
+
+                strengthText.text(strength.text).css('color', strength.color);
+            });
+
+            function getPasswordStrength(password) {
+                var score = 0;
+                var feedback = [];
+
+                if (password.length >= 8) score += 25;
+                else feedback.push('En az 8 karakter');
+
+                if (/[a-z]/.test(password)) score += 25;
+                else feedback.push('Küçük harf');
+
+                if (/[A-Z]/.test(password)) score += 25;
+                else feedback.push('Büyük harf');
+
+                if (/\d/.test(password)) score += 25;
+                else feedback.push('Rakam');
+
+                var result = {
+                    percentage: score,
+                    text: feedback.length > 0 ? 'Eksik özellik: ' + feedback.join(', ') : 'Şifre güçlü',
+                    class: score < 50 ? 'bg-danger' : score < 75 ? 'bg-warning' : 'bg-success',
+                    color: score < 50 ? '#dc3545' : score < 75 ? '#ffc107' : '#198754'
+                };
+
+                return result;
+            }
+
+            // Confirm password matching
+            $('#floatingConfirmPassword').on('input', function () {
+                var password = $('#floatingPassword').val();
+                var confirmPassword = $(this).val();
+
+                if (confirmPassword && password !== confirmPassword) {
+                    $(this).addClass('is-invalid');
+                } else {
+                    $(this).removeClass('is-invalid').addClass('is-valid');
+                }
+            });
+
+            // Form validation
+            $('.register-form').on('submit', function (e) {
+                if (!$('#agreeToTerms').is(':checked')) {
+                    e.preventDefault();
+                    showAlert('Lütfen kullanım koşullarını ve gizlilik politikasını kabul edin', 'warning');
+                    return false;
+                }
+
+                var password = $('#floatingPassword').val();
+                var confirmPassword = $('#floatingConfirmPassword').val();
+
+                if (password !== confirmPassword) {
+                    e.preventDefault();
+                    showAlert('Şifreler eşleşmiyor', 'danger');
+                    return false;
+                }
+            });
+
+            function showAlert(message, type) {
+                // Önceki uyarıları temizle
+                $('.card-body .alert').remove();
+
+                var alert = $('<div class="alert alert-' + type + ' alert-dismissible fade show" role="alert">' +
+                    '<i class="fas fa-exclamation-triangle me-2"></i>' + message +
+                    '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+                    '</div>');
+
+                $('.card-body').prepend(alert);
+
+                setTimeout(function () {
+                    alert.alert('close');
+                }, 5000);
+            }
+
+            // Add focus effects
+            $('.form-floating .form-control').on('focus', function () {
+                $(this).parent().addClass('focused');
+            }).on('blur', function () {
+                if (!$(this).val()) {
+                    $(this).parent().removeClass('focused');
+                }
+            });
+
+            // Animate registration card
+            $('.register-card').addClass('animate__animated animate__fadeInUp');
+        });
+    </script>
+}
+
+<style>
+    /* CSS for registration page - RTL support with text-align and float properties configured in HTML */
+    .register-page {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        min-height: 100vh;
+    }
+
+    .register-card {
+        border-radius: 20px;
+        backdrop-filter: blur(10px);
+        background: rgba(255, 255, 255, 0.95);
+    }
+
+    .bg-gradient-success {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    }
+
+    .shadow-2xl {
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+
+    .form-floating.focused label {
+        color: #11998e !important;
+    }
+
+    .form-floating .form-control:focus {
+        border-color: #11998e;
+        box-shadow: 0 0 0 0.2rem rgba(17, 153, 142, 0.25);
+    }
+
+    .password-strength-meter {
+        margin-top: 5px;
+    }
+
+    .btn {
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    .register-icon {
+        animation: bounce 2s infinite;
+    }
+
+    @@keyframes bounce {
+        0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+        40% { transform: translateY(-10px); }
+        transform: translateY(-5px);
+    }
+
+    @@media (max-width: 768px) {
+        .register-page {
+            padding: 20px 0;
+        }
+
+        .card-body {
+            padding: 30px 20px !important;
+        }
+    }
+</style>

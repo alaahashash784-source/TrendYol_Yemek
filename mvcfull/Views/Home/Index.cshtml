@@ -1,0 +1,204 @@
+@*
+    الصفحة الرئيسية - تعرض المطاعم المميزة وروابط التنقل
+    Controller: HomeController.cs → Action: Index()
+    الربط: Html.ActionLink ينتقل إلى Restaurant/Index و Food/Index
+*@
+@model IEnumerable<mvc_full.Models.Restoran>
+
+@{
+    ViewBag.Title = "Ana Sayfa - TrendYol Yemek";
+}
+
+@section styles {
+    @Styles.Render("~/Content/css/home-page.css")
+}
+
+@Html.AntiForgeryToken()
+
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center min-vh-100" style="flex-direction: row !important;">
+            <div class="col-lg-6 order-lg-1" style="text-align: left !important;">
+                <div class="hero-content" style="text-align: left !important;">
+                    <h1 class="display-3 fw-bold text-white mb-4 animate__animated animate__fadeInLeft">
+                        TrendYol Yemek
+                        <span class="text-warning">Siparisleriniz Kapida!</span>
+                    </h1>
+                    <p class="lead text-light mb-5 animate__animated animate__fadeInLeft animate__delay-1s">
+                        En sevdiginiz restoranlardan en lezzetli yemekleri hizli ve guvenli sekilde kapiniza getiriyoruz.
+                    </p>
+                    <div class="hero-buttons animate__animated animate__fadeInUp animate__delay-2s">
+                        @Html.ActionLink("Restoranlari Kesfet", "Index", "Restaurant", null, new { @class = "btn btn-warning btn-lg me-3 px-4 py-3 fw-bold" })
+                        @Html.ActionLink("Yemekleri Gor", "Index", "Food", null, new { @class = "btn btn-outline-light btn-lg px-4 py-3 fw-bold" })
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center order-lg-2">
+                <div class="hero-image animate__animated animate__fadeInRight animate__delay-1s">
+                    <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=500&h=400&fit=crop" 
+                         alt="Lezzetli Yemekler" class="img-fluid floating-animation rounded-4 shadow-lg"
+                         onerror="this.style.display='none'">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section py-5 bg-light">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-12">
+                <h2 class="display-5 fw-bold text-primary mb-3">Neden TrendYol Yemek?</h2>
+                <p class="lead text-muted">Size en iyi hizmeti sunmak icin buradayiz</p>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="feature-card text-center p-4 h-100">
+                    <div class="feature-icon mb-4">
+                        <i class="fas fa-shipping-fast fa-4x text-primary"></i>
+                    </div>
+                    <h4 class="fw-bold mb-3">Hizli Teslimat</h4>
+                    <p class="text-muted">Siparisleriniz 30 dakika icinde kapinizda</p>
+                    <div class="feature-stats">
+                        <span class="badge bg-primary fs-6">Ortalama 25 Dakika</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="feature-card text-center p-4 h-100">
+                    <div class="feature-icon mb-4">
+                        <i class="fas fa-credit-card fa-4x text-success"></i>
+                    </div>
+                    <h4 class="fw-bold mb-3">Guvenli Odeme</h4>
+                    <p class="text-muted">Kredi karti, nakit veya online odeme</p>
+                    <div class="feature-stats">
+                        <span class="badge bg-success fs-6">SSL Guvenli</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="feature-card text-center p-4 h-100">
+                    <div class="feature-icon mb-4">
+                        <i class="fas fa-headset fa-4x text-warning"></i>
+                    </div>
+                    <h4 class="fw-bold mb-3">7/24 Destek</h4>
+                    <p class="text-muted">Her zaman yaninizdayiz</p>
+                    <div class="feature-stats">
+                        <span class="badge bg-warning text-dark fs-6">Canli Destek</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Popular Restaurants Section -->
+<section class="restaurants-section py-5">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-md-6">
+                @Html.ActionLink("Tum Restoranlari Gor", "Index", "Restaurant", null, new { @class = "btn btn-primary btn-lg" })
+            </div>
+            <div class="col-md-6 text-md-end">
+                <h2 class="display-5 fw-bold text-primary">Populer Restoranlar</h2>
+                <p class="text-muted">En cok tercih edilen restoranlarimiz</p>
+            </div>
+        </div>
+
+        @if (Model != null && Model.Any())
+        {
+            <div class="row">
+                @foreach (var restoran in Model.Take(6))
+                {
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="card h-100 restaurant-card border-0 shadow-sm">
+                            <div class="restaurant-image-container position-relative">
+                                <img src="@(string.IsNullOrEmpty(restoran.ResimUrl) ? "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=600" : restoran.ResimUrl)" 
+                                     class="card-img-top restaurant-image" alt="@restoran.Ad">
+                                <span class="restaurant-badge badge bg-success">Acik</span>
+                                <div class="restaurant-overlay">
+                                    @Html.ActionLink("Menuyu Gor", "ByRestaurant", "Food", new { id = restoran.RestoranId }, new { @class = "btn btn-warning btn-lg" })
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title fw-bold">@restoran.Ad</h5>
+                                <p class="card-text text-muted small">@(string.IsNullOrEmpty(restoran.Aciklama) ? "Lezzetli yemekler" : restoran.Aciklama)</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-success delivery-time">
+                                        <i class="fas fa-clock me-1"></i>Dakika 30-45
+                                    </small>
+                                    <div class="rating">
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                        <span class="text-muted">(4.8)</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-5 empty-state">
+                <i class="fas fa-store fa-5x text-muted"></i>
+                <h4 class="mt-4 text-muted">Henuz restoran eklenmemis</h4>
+                <p class="text-muted">Yeni restoranlar yakinda eklenecek</p>
+            </div>
+        }
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="stats-section py-5 text-white">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-3 col-6 mb-4">
+                <div class="stat-item">
+                    <span class="stat-number">500+</span>
+                    <span class="stat-label">Restoran</span>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 mb-4">
+                <div class="stat-item">
+                    <span class="stat-number">10K+</span>
+                    <span class="stat-label">Mutlu Musteri</span>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 mb-4">
+                <div class="stat-item">
+                    <span class="stat-number">50K+</span>
+                    <span class="stat-label">Siparis</span>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 mb-4">
+                <div class="stat-item">
+                    <span class="stat-number">25dk</span>
+                    <span class="stat-label">Ort. Teslimat</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section py-5 text-white text-center">
+    <div class="container">
+        <h2 class="display-5 fw-bold mb-4">Hemen Siparis Verin!</h2>
+        <p class="lead mb-4">En lezzetli yemekler bir tik uzaginizda</p>
+        <div class="cta-buttons">
+            @Html.ActionLink("Restoranlari Kesfet", "Index", "Restaurant", null, new { @class = "btn btn-warning btn-lg px-5 py-3 fw-bold" })
+            @Html.ActionLink("Yemekleri Gor", "Index", "Food", null, new { @class = "btn btn-outline-light btn-lg px-5 py-3 fw-bold" })
+        </div>
+    </div>
+</section>

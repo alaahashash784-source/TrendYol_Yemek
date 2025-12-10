@@ -1,0 +1,189 @@
+@*
+    صفحة الملف الشخصي - تعرض بيانات المستخدم الحالي
+    Controller: AccountController.cs → Action: Profile()
+    الربط: Url.Action("Orders") ينتقل لعرض الطلبات
+*@
+@model mvc_full.Models.Musteri
+
+@{
+    ViewBag.Title = "Profilim";
+    var kayitTarihi = Model.KayitTarihi != DateTime.MinValue ? Model.KayitTarihi.ToString("dd MMMM yyyy") : "Bilinmiyor";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Profile Header -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body text-center py-5" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 15px 15px 0 0;">
+                    <div class="profile-avatar mb-3">
+                        <div class="avatar-circle mx-auto" style="width: 100px; height: 100px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-user fa-3x text-primary"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-white mb-1">@Model.TamAd</h3>
+                    <p class="text-white-50 mb-0">@Model.Email</p>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <div class="stat-item">
+                                <i class="fas fa-shopping-bag text-primary fa-2x mb-2"></i>
+                                <h5 class="mb-0">0</h5>
+                                <small class="text-muted">Siparis</small>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="stat-item">
+                                <i class="fas fa-heart text-danger fa-2x mb-2"></i>
+                                <h5 class="mb-0">0</h5>
+                                <small class="text-muted">Favori</small>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="stat-item">
+                                <i class="fas fa-star text-warning fa-2x mb-2"></i>
+                                <h5 class="mb-0">0</h5>
+                                <small class="text-muted">Yorum</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Form -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0">
+                        <i class="fas fa-edit text-primary me-2"></i>Profil Bilgileri
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    @using (Html.BeginForm("Profile", "Account", FormMethod.Post, new { @class = "needs-validation" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.HiddenFor(m => m.MusteriId)
+                        @Html.HiddenFor(m => m.KayitTarihi)
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-user me-1 text-primary"></i>Ad
+                                </label>
+                                @Html.TextBoxFor(m => m.Ad, new { @class = "form-control", placeholder = "Adiniz" })
+                                @Html.ValidationMessageFor(m => m.Ad, "", new { @class = "text-danger small" })
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-user me-1 text-primary"></i>Soyad
+                                </label>
+                                @Html.TextBoxFor(m => m.Soyad, new { @class = "form-control", placeholder = "Soyadiniz" })
+                                @Html.ValidationMessageFor(m => m.Soyad, "", new { @class = "text-danger small" })
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-envelope me-1 text-primary"></i>E-posta
+                            </label>
+                            @Html.TextBoxFor(m => m.Email, new { @class = "form-control", placeholder = "E-posta adresiniz", type = "email" })
+                            @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger small" })
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-phone me-1 text-primary"></i>Telefon
+                            </label>
+                            @Html.TextBoxFor(m => m.Telefon, new { @class = "form-control", placeholder = "Telefon numaraniz" })
+                            @Html.ValidationMessageFor(m => m.Telefon, "", new { @class = "text-danger small" })
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-map-marker-alt me-1 text-primary"></i>Adres
+                            </label>
+                            @Html.TextAreaFor(m => m.Adres, new { @class = "form-control", placeholder = "Teslimat adresiniz", rows = 3 })
+                            @Html.ValidationMessageFor(m => m.Adres, "", new { @class = "text-danger small" })
+                        </div>
+
+                        <hr class="my-4" />
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-lock me-1 text-primary"></i>Yeni Sifre
+                            </label>
+                            <input type="password" name="Sifre" class="form-control" placeholder="Degistirmek icin yeni sifre girin" />
+                            <small class="text-muted">Bos birakirsaniz mevcut sifre korunur</small>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mt-4">
+                            <small class="text-muted">
+                                <i class="fas fa-calendar me-1"></i>
+                                Kayit Tarihi: @kayitTarihi
+                            </small>
+                            <button type="submit" class="btn btn-primary px-4">
+                                <i class="fas fa-save me-2"></i>Kaydet
+                            </button>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Quick Links -->
+            <div class="row mt-4">
+                <div class="col-md-6 mb-3">
+                    <a href="@Url.Action("Orders", "Account")" class="card border-0 shadow-sm text-decoration-none h-100">
+                        <div class="card-body d-flex align-items-center">
+                            <div class="icon-box bg-primary bg-opacity-10 rounded-circle p-3 me-3">
+                                <i class="fas fa-shopping-bag text-primary fa-lg"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0 text-dark">Siparislerim</h6>
+                                <small class="text-muted">Gecmis siparislerinizi gorun</small>
+                            </div>
+                            <i class="fas fa-chevron-right ms-auto text-muted"></i>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <a href="@Url.Action("Index", "OrderPage")" class="card border-0 shadow-sm text-decoration-none h-100">
+                        <div class="card-body d-flex align-items-center">
+                            <div class="icon-box bg-success bg-opacity-10 rounded-circle p-3 me-3">
+                                <i class="fas fa-shopping-cart text-success fa-lg"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0 text-dark">Sepetim</h6>
+                                <small class="text-muted">Sepetinizdeki urunleri gorun</small>
+                            </div>
+                            <i class="fas fa-chevron-right ms-auto text-muted"></i>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border-radius: 15px;
+    }
+    .form-control {
+        border-radius: 10px;
+        padding: 12px 15px;
+    }
+    .form-control:focus {
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.25);
+        border-color: #667eea;
+    }
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        border-radius: 10px;
+        padding: 10px 25px;
+    }
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #5a6fd6 0%, #6a4190 100%);
+        transform: translateY(-2px);
+    }
+</style>

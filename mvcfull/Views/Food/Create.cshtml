@@ -1,0 +1,402 @@
+@*
+    صفحة إضافة طعام جديد - نموذج إدخال بيانات الطعام (للمدير فقط)
+    Controller: FoodController.cs → Action: Create()
+    الربط: Html.BeginForm يرسل POST لحفظ الطعام في DB
+*@
+@model mvc_full.Models.Yemek
+
+@{
+    ViewBag.Title = "Yeni Yemek Ekle";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-primary text-white py-4">
+                    <h3 class="mb-0"><i class="fas fa-plus-circle me-2"></i>Yeni Yemek Ekle</h3>
+                </div>
+                <div class="card-body p-5">
+                    @using (Html.BeginForm())
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Yemek Adi *</label>
+                            @Html.EditorFor(model => model.Ad, new { htmlAttributes = new { @class = "form-control form-control-lg", placeholder = "Ornek: Adana Kebap" } })
+                            @Html.ValidationMessageFor(model => model.Ad, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Aciklama</label>
+                            @Html.TextAreaFor(model => model.Aciklama, new { @class = "form-control", rows = 3, placeholder = "Yemek hakkinda kisa aciklama..." })
+                            @Html.ValidationMessageFor(model => model.Aciklama, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label fw-bold">Fiyat (TL) *</label>
+                                @Html.EditorFor(model => model.Fiyat, new { htmlAttributes = new { @class = "form-control form-control-lg", placeholder = "0.00" } })
+                                @Html.ValidationMessageFor(model => model.Fiyat, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label fw-bold">Restoran *</label>
+                                @Html.DropDownList("RestoranId", null, "-- Restoran Secin --", new { @class = "form-select form-select-lg" })
+                                @Html.ValidationMessageFor(model => model.RestoranId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-image text-secondary me-1"></i>Resim URL
+                            </label>
+                            @Html.TextBoxFor(model => model.ResimUrl, new { @class = "form-control form-control-lg", placeholder = "https://images.unsplash.com/photo-...", id = "ResimUrl" })
+                            @Html.ValidationMessageFor(model => model.ResimUrl, "", new { @class = "text-danger" })
+                            <small class="text-muted">Resim URL'sini yapistirin veya asagidaki hazir resimlerden secin</small>
+                        </div>
+
+                        <!-- Yemek Kategorileri -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-utensils text-warning me-1"></i>Hazir Yemek Resimleri (Birini Secin)
+                            </label>
+                            
+                            <!-- Kategori Sekmeleri -->
+                            <ul class="nav nav-pills mb-3" id="foodCategoryTabs" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#kebaplar" type="button">🥙 Kebaplar</button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" data-bs-toggle="pill" data-bs-target="#pizzalar" type="button">🍕 Pizzalar</button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" data-bs-toggle="pill" data-bs-target="#burgerler" type="button">🍔 Burgerler</button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tatlilar" type="button">🍰 Tatlilar</button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" data-bs-toggle="pill" data-bs-target="#icecekler" type="button">🥤 Icecekler</button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" data-bs-toggle="pill" data-bs-target="#salatalar" type="button">🥗 Salatalar</button>
+                                </li>
+                            </ul>
+                            
+                            <div class="tab-content border rounded p-3" id="foodCategoryContent">
+                                <!-- Kebaplar -->
+                                <div class="tab-pane fade show active" id="kebaplar" role="tabpanel">
+                                    <div class="row g-2">
+                                        <div class="col-4 col-md-2">
+                                            <div class="image-option" data-url="https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=400">
+                                                <img src="https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=200" class="img-fluid rounded" alt="Kebap 1">
+                                            </div>
+                                        </div>
+                                        <div class="col-4 col-md-2">
+                                            <div class="image-option" data-url="https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=400">
+                                                <img src="https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=200" class="img-fluid rounded" alt="Kebap 2">
+                                            </div>
+                                        </div>
+                                        <div class="col-4 col-md-2">
+                                            <div class="image-option" data-url="https://images.unsplash.com/photo-1561651823-34feb02250e4?w=400">
+                                                <img src="https://images.unsplash.com/photo-1561651823-34feb02250e4?w=200" class="img-fluid rounded" alt="Doner">
+                                            </div>
+                                        </div>
+                                        <div class="col-4 col-md-2">
+                                            <div class="image-option" data-url="https://images.unsplash.com/photo-1544025162-d76694265947?w=400">
+                                                <img src="https://images.unsplash.com/photo-1544025162-d76694265947?w=200" class="img-fluid rounded" alt="Et">
+                                            </div>
+                                        </div>
+                                        <div class="col-4 col-md-2">
+                                            <div class="image-option" data-url="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400">
+                                                <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=200" class="img-fluid rounded" alt="Izgara">
+                                            </div>
+                                        </div>
+                                        <div class="col-4 col-md-2">
+                                            <div class="image-option" data-url="https://images.unsplash.com/photo-1432139509613-5c4255815697?w=400">
+                                                <img src="https://images.unsplash.com/photo-1432139509613-5c4255815697?w=200" class="img-fluid rounded" alt="Tavuk">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Pizzalar -->
+                                <div class="tab-pane fade" id="pizzalar" role="tabpanel">
+                                    <div class="row g-2">
+                                        <div class="col-4 col-md-2">
+                                            <div class="image-option" data-url="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400">
+                                                <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=200" class="img-fluid rounded" alt="Pizza 1">
+                                            </div>
+                                        </div>
+                                        <div class="col-4 col-md-2">
+                                            <div class="image-option" data-url="https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=400">
+                                                <img src="https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=200" class="img-fluid rounded" alt="Pizza 2">
+                                            </div>
+                                        </div>
+                                        <div class="col-4 col-md-2">
+                                            <div class="image-option" data-url="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=400">
+                                                <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=200" class="img-fluid rounded" alt="Pizza 3">
+                                            </div>
+                                        </div>
+                                        <div class="col-4 col-md-2">
+                                            <div class="image-option" data-url="https://images.unsplash.com/photo-1588315029754-2dd089d39a1a?w=400">
+                                                <img src="https://images.unsplash.com/photo-1588315029754-2dd089d39a1a?w=200" class="img-fluid rounded" alt="Pizza 4">
+                                            </div>
+                                        </div>
+                                        <div class="col-4 col-md-2">
+                                            <div class="image-option" data-url="https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?w=400">
+                                                <img src="https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?w=200" class="img-fluid rounded" alt="Pizza 5">
+                                            </div>
+                                        </div>
+                                        <div class="col-4 col-md-2">
+                                            <div class="image-option" data-url="https://images.unsplash.com/photo-1571407970349-bc81e7e96d47?w=400">
+                                                <img src="https://images.unsplash.com/photo-1571407970349-bc81e7e96d47?w=200" class="img-fluid rounded" alt="Pizza 6">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Burgerler -->
+                                <div class="tab-pane fade" id="burgerler" role="tabpanel">
+                                    <div class="row g-2">
+                                        <div class="col-4 col-md-2">
+                                            <div class="image-option" data-url="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400">
+                                                <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=200" class="img-fluid rounded" alt="Burger 1">
+                                            </div>
+                                        </div>
+                                        <div class="col-4 col-md-2">
+                                            <div class="image-option" data-url="https://images.unsplash.com/photo-1550547660-d9450f859349?w=400">
+                                                <img src="https://images.unsplash.com/photo-1550547660-d9450f859349?w=200" class="img-fluid rounded" alt="Burger 2">
+                                            </div>
+                                        </div>
+                                        <div class="col-4 col-md-2">
+                                            <div class="image-option" data-url="https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=400">
+                                                <img src="https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=200" class="img-fluid rounded" alt="Burger 3">
+                                            </div>
+                                        </div>
+                                        <div class="col-4 col-md-2">
+                                            <div class="image-option" data-url="https://images.unsplash.com/photo-1586190848861-99aa4a171e90?w=400">
+                                                <img src="https://images.unsplash.com/photo-1586190848861-99aa4a171e90?w=200" class="img-fluid rounded" alt="Burger 4">
+                                            </div>
+                                        </div>
+                                        <div class="col-4 col-md-2">
+                                            <div class="image-option" data-url="https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?w=400">
+                                                <img src="https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?w=200" class="img-fluid rounded" alt="Burger 5">
+                                            </div>
+                                        </div>
+                                        <div class="col-4 col-md-2">
+                                            <div class="image-option" data-url="https://images.unsplash.com/photo-1553979459-d2229ba7433b?w=400">
+                                                <img src="https://images.unsplash.com/photo-1553979459-d2229ba7433b?w=200" class="img-fluid rounded" alt="Burger 6">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Tatlilar -->
+                                <div class="tab-pane fade" id="tatlilar" role="tabpanel">
+                                    <div class="row g-2">
+                                        <div class="col-4 col-md-2">
+                                            <div class="image-option" data-url="https://images.unsplash.com/photo-1551024506-0bccd828d307?w=400">
+                                                <img src="https://images.unsplash.com/photo-1551024506-0bccd828d307?w=200" class="img-fluid rounded" alt="Tatli 1">
+                                            </div>
+                                        </div>
+                                        <div class="col-4 col-md-2">
+                                            <div class="image-option" data-url="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400">
+                                                <img src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=200" class="img-fluid rounded" alt="Pasta">
+                                            </div>
+                                        </div>
+                                        <div class="col-4 col-md-2">
+                                            <div class="image-option" data-url="https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?w=400">
+                                                <img src="https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?w=200" class="img-fluid rounded" alt="Baklava">
+                                            </div>
+                                        </div>
+                                        <div class="col-4 col-md-2">
+                                            <div class="image-option" data-url="https://images.unsplash.com/photo-1488477181946-6428a0291777?w=400">
+                                                <img src="https://images.unsplash.com/photo-1488477181946-6428a0291777?w=200" class="img-fluid rounded" alt="Dondurma">
+                                            </div>
+                                        </div>
+                                        <div class="col-4 col-md-2">
+                                            <div class="image-option" data-url="https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=400">
+                                                <img src="https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=200" class="img-fluid rounded" alt="Kunefe">
+                                            </div>
+                                        </div>
+                                        <div class="col-4 col-md-2">
+                                            <div class="image-option" data-url="https://images.unsplash.com/photo-1587314168485-3236d6710814?w=400">
+                                                <img src="https://images.unsplash.com/photo-1587314168485-3236d6710814?w=200" class="img-fluid rounded" alt="Cheesecake">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Icecekler -->
+                                <div class="tab-pane fade" id="icecekler" role="tabpanel">
+                                    <div class="row g-2">
+                                        <div class="col-4 col-md-2">
+                                            <div class="image-option" data-url="https://images.unsplash.com/photo-1544145945-f90425340c7e?w=400">
+                                                <img src="https://images.unsplash.com/photo-1544145945-f90425340c7e?w=200" class="img-fluid rounded" alt="Kahve">
+                                            </div>
+                                        </div>
+                                        <div class="col-4 col-md-2">
+                                            <div class="image-option" data-url="https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=400">
+                                                <img src="https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=200" class="img-fluid rounded" alt="Cay">
+                                            </div>
+                                        </div>
+                                        <div class="col-4 col-md-2">
+                                            <div class="image-option" data-url="https://images.unsplash.com/photo-1546173159-315724a31696?w=400">
+                                                <img src="https://images.unsplash.com/photo-1546173159-315724a31696?w=200" class="img-fluid rounded" alt="Smoothie">
+                                            </div>
+                                        </div>
+                                        <div class="col-4 col-md-2">
+                                            <div class="image-option" data-url="https://images.unsplash.com/photo-1534353473418-4cfa6c56fd38?w=400">
+                                                <img src="https://images.unsplash.com/photo-1534353473418-4cfa6c56fd38?w=200" class="img-fluid rounded" alt="Limonata">
+                                            </div>
+                                        </div>
+                                        <div class="col-4 col-md-2">
+                                            <div class="image-option" data-url="https://images.unsplash.com/photo-1595981267035-7b04ca84a82d?w=400">
+                                                <img src="https://images.unsplash.com/photo-1595981267035-7b04ca84a82d?w=200" class="img-fluid rounded" alt="Ayran">
+                                            </div>
+                                        </div>
+                                        <div class="col-4 col-md-2">
+                                            <div class="image-option" data-url="https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?w=400">
+                                                <img src="https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?w=200" class="img-fluid rounded" alt="Meyve Suyu">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Salatalar -->
+                                <div class="tab-pane fade" id="salatalar" role="tabpanel">
+                                    <div class="row g-2">
+                                        <div class="col-4 col-md-2">
+                                            <div class="image-option" data-url="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400">
+                                                <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=200" class="img-fluid rounded" alt="Salata 1">
+                                            </div>
+                                        </div>
+                                        <div class="col-4 col-md-2">
+                                            <div class="image-option" data-url="https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400">
+                                                <img src="https://images.unsplash.com/photo-1540420773420-3366772f4999?w=200" class="img-fluid rounded" alt="Salata 2">
+                                            </div>
+                                        </div>
+                                        <div class="col-4 col-md-2">
+                                            <div class="image-option" data-url="https://images.unsplash.com/photo-1546793665-c74683f339c1?w=400">
+                                                <img src="https://images.unsplash.com/photo-1546793665-c74683f339c1?w=200" class="img-fluid rounded" alt="Sezar">
+                                            </div>
+                                        </div>
+                                        <div class="col-4 col-md-2">
+                                            <div class="image-option" data-url="https://images.unsplash.com/photo-1607532941433-304659e8198a?w=400">
+                                                <img src="https://images.unsplash.com/photo-1607532941433-304659e8198a?w=200" class="img-fluid rounded" alt="Coban">
+                                            </div>
+                                        </div>
+                                        <div class="col-4 col-md-2">
+                                            <div class="image-option" data-url="https://images.unsplash.com/photo-1505253716362-afaea1d3d1af?w=400">
+                                                <img src="https://images.unsplash.com/photo-1505253716362-afaea1d3d1af?w=200" class="img-fluid rounded" alt="Meyve">
+                                            </div>
+                                        </div>
+                                        <div class="col-4 col-md-2">
+                                            <div class="image-option" data-url="https://images.unsplash.com/photo-1547496502-affa22d38842?w=400">
+                                                <img src="https://images.unsplash.com/photo-1547496502-affa22d38842?w=200" class="img-fluid rounded" alt="Bowl">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Secilen Resim Onizleme -->
+                        <div class="mb-4 text-center" id="imagePreviewContainer">
+                            <label class="form-label fw-bold d-block">
+                                <i class="fas fa-eye text-primary me-1"></i>Secilen Resim Onizleme
+                            </label>
+                            <img id="imagePreview" src="" alt="Onizleme" class="img-fluid rounded shadow" style="max-height: 200px; display: none;">
+                            <p id="noImageText" class="text-muted">Henuz resim secilmedi</p>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="d-flex gap-3">
+                            <button type="submit" class="btn btn-success btn-lg px-5">
+                                <i class="fas fa-save me-2"></i>Kaydet
+                            </button>
+                            @Html.ActionLink("Iptal", "Index", null, new { @class = "btn btn-outline-secondary btn-lg px-5" })
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script>
+        // انتظار تحميل الصفحة
+        $(document).ready(function() {
+            // معالجة النقر على الصور
+            $('.image-option').on('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                var url = $(this).data('url');
+                console.log('Selected URL:', url);
+                
+                // تحديث قيمة الـ input
+                $('#ResimUrl').val(url);
+                
+                // تحديث الـ preview
+                $('#imagePreview').attr('src', url).show();
+                $('#noImageText').hide();
+                
+                // إزالة الـ selected من كل الصور وإضافته للمختارة
+                $('.image-option').removeClass('selected');
+                $(this).addClass('selected');
+            });
+            
+            // تحديث الـ preview عند كتابة URL يدوياً
+            $('#ResimUrl').on('input', function() {
+                var url = $(this).val();
+                if (url) {
+                    $('#imagePreview').attr('src', url).show();
+                    $('#noImageText').hide();
+                } else {
+                    $('#imagePreview').hide();
+                    $('#noImageText').show();
+                }
+                $('.image-option').removeClass('selected');
+            });
+        });
+    </script>
+    <style>
+        .image-option {
+            cursor: pointer;
+            border: 3px solid transparent;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        .image-option:hover {
+            border-color: #0d6efd;
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3);
+        }
+        .image-option.selected {
+            border-color: #198754;
+            box-shadow: 0 4px 15px rgba(25, 135, 84, 0.4);
+        }
+        .image-option img {
+            height: 70px;
+            width: 100%;
+            object-fit: cover;
+        }
+        .nav-pills .nav-link {
+            color: #333;
+            background-color: #f8f9fa;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+        .nav-pills .nav-link.active {
+            background-color: #0d6efd;
+            color: white;
+        }
+    </style>
+}

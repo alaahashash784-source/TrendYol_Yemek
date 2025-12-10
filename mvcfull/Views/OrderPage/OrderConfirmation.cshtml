@@ -1,0 +1,119 @@
+﻿@model mvc_full.Models.OrderPage
+
+@{
+    ViewBag.Title = "Siparis Onaylandi";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg border-0">
+                <div class="card-body text-center p-5">
+                    <div class="mb-4">
+                        <i class="fas fa-check-circle text-success" style="font-size: 5rem;"></i>
+                    </div>
+                    <h2 class="text-success mb-3">Odeme Gerceklestirildi!</h2>
+                    <h4 class="text-primary mb-3">Siparisizin Basariyla Alindi!</h4>
+                    <p class="text-muted mb-4">
+                        Siparisizin basariyla alindi. En kisa surede hazirlanip size ulastirilacaktir.
+                    </p>
+                    
+                    @if (Model != null)
+                    {
+                        <div class="alert alert-success border mb-4">
+                            <div class="row">
+                                <div class="col-md-6 text-start">
+                                    <small class="text-muted d-block">Siparis Numarasi</small>
+                                    <h4 class="mb-0 text-success fw-bold">#@Model.OrderId</h4>
+                                </div>
+                                <div class="col-md-6 text-start">
+                                    <small class="text-muted d-block">Siparis Tarihi</small>
+                                    <h5 class="mb-0">@Model.OrderDate.ToString("dd/MM/yyyy HH:mm")</h5>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card bg-light mb-4">
+                            <div class="card-body text-start">
+                                <h5 class="card-title"><i class="fas fa-info-circle me-2"></i>Siparis Detaylari</h5>
+                                <hr>
+                                <div class="row mb-2">
+                                    <div class="col-6"><strong>Toplam Tutar:</strong></div>
+                                    <div class="col-6 text-end text-success fw-bold">@Model.TotalPrice.ToString("F2") TL</div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-6"><strong>Odeme Yontemi:</strong></div>
+                                    <div class="col-6 text-end">@(Model.PaymentMethod ?? "Kapida Odeme")</div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-6"><strong>Siparis Durumu:</strong></div>
+                                    <div class="col-6 text-end"><span class="badge bg-success">@Model.OrderStatus</span></div>
+                                </div>
+                                @if (!string.IsNullOrEmpty(Model.DeliveryAddress))
+                                {
+                                    <div class="row mb-2">
+                                        <div class="col-12"><strong>Teslimat Adresi:</strong></div>
+                                        <div class="col-12 text-muted">@Model.DeliveryAddress</div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                    
+                    <div class="bg-light rounded p-3 mb-4">
+                        <div class="row text-center">
+                            <div class="col-4">
+                                <i class="fas fa-clock text-warning fa-2x mb-2"></i>
+                                <small class="text-muted d-block">Tahmini Teslimat</small>
+                                <span class="fw-bold">30-45 Dakika</span>
+                            </div>
+                            <div class="col-4">
+                                <i class="fas fa-check text-success fa-2x mb-2"></i>
+                                <small class="text-muted d-block">Odeme Durumu</small>
+                                <span class="fw-bold text-success">Onaylandi</span>
+                            </div>
+                            <div class="col-4">
+                                <i class="fas fa-motorcycle text-primary fa-2x mb-2"></i>
+                                <small class="text-muted d-block">Kurye</small>
+                                <span class="fw-bold">Atandi</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <p class="text-muted small mb-4">
+                        <i class="fas fa-envelope me-1"></i> Siparis durumunuz hakkinda e-posta ile bilgilendirileceksiniz.
+                    </p>
+                    
+                    <div class="d-grid gap-2">
+                        <a href="@Url.Action("Index", "Home")" class="btn btn-primary btn-lg">
+                            <i class="fas fa-home me-2"></i>Ana Sayfaya Don
+                        </a>
+                        <a href="@Url.Action("Index", "Restaurant")" class="btn btn-outline-secondary">
+                            <i class="fas fa-utensils me-2"></i>Yeni Siparis Ver
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-4">
+                <p class="text-muted small">
+                    <i class="fas fa-phone-alt me-1"></i> Yardim icin: 0850 123 45 67
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border-radius: 20px;
+    }
+    .fa-check-circle {
+        animation: pulse 2s ease-in-out infinite;
+    }
+    @@keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+    }
+</style>

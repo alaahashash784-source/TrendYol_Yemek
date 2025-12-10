@@ -1,0 +1,237 @@
+@*
+    لوحة تحكم الإدارة - تعرض إحصائيات الموقع (طلبات، مستخدمين، مطاعم)
+    Controller: AdminController.cs → Action: Index()
+    الربط: يتطلب [AdminAuthorizationFilter] للوصول
+*@
+@model mvc_full.Controllers.AdminDashboardViewModel
+
+@{
+    ViewBag.Title = "Admin Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .admin-header {
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        color: white;
+        padding: 40px 0;
+        margin-bottom: 30px;
+        border-radius: 0 0 20px 20px;
+    }
+    .stat-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        transition: transform 0.3s;
+        overflow: hidden;
+    }
+    .stat-card:hover {
+        transform: translateY(-5px);
+    }
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+    }
+    .quick-action {
+        border-radius: 10px;
+        padding: 20px;
+        text-align: center;
+        transition: all 0.3s;
+        text-decoration: none;
+        color: white;
+    }
+    .quick-action:hover {
+        transform: scale(1.05);
+        color: white;
+        text-decoration: none;
+    }
+</style>
+
+<div class="admin-header">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="mb-2"><i class="fas fa-shield-alt me-3"></i>Admin Panel</h1>
+                <p class="mb-0 opacity-75">TrendYol Yemek Yonetim Sistemi</p>
+            </div>
+            <div>
+                <span class="badge bg-light text-dark fs-6">
+                    <i class="fas fa-user-shield me-2"></i>Administrator
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+            <div class="card stat-card h-100">
+                <div class="card-body text-center">
+                    <div class="stat-icon bg-primary text-white mx-auto mb-3">
+                        <i class="fas fa-store"></i>
+                    </div>
+                    <h3 class="fw-bold text-primary">@Model.TotalRestaurants</h3>
+                    <p class="text-muted mb-0">Restoranlar</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+            <div class="card stat-card h-100">
+                <div class="card-body text-center">
+                    <div class="stat-icon bg-success text-white mx-auto mb-3">
+                        <i class="fas fa-utensils"></i>
+                    </div>
+                    <h3 class="fw-bold text-success">@Model.TotalFoods</h3>
+                    <p class="text-muted mb-0">Yemekler</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+            <div class="card stat-card h-100">
+                <div class="card-body text-center">
+                    <div class="stat-icon bg-info text-white mx-auto mb-3">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3 class="fw-bold text-info">@Model.TotalCustomers</h3>
+                    <p class="text-muted mb-0">Musteriler</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+            <div class="card stat-card h-100">
+                <div class="card-body text-center">
+                    <div class="stat-icon bg-warning text-white mx-auto mb-3">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <h3 class="fw-bold text-warning">@Model.TotalOrders</h3>
+                    <p class="text-muted mb-0">Toplam Siparis</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+            <div class="card stat-card h-100">
+                <div class="card-body text-center">
+                    <div class="stat-icon bg-danger text-white mx-auto mb-3">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <h3 class="fw-bold text-danger">@Model.TodayOrders</h3>
+                    <p class="text-muted mb-0">Bugunun Siparisleri</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+            <div class="card stat-card h-100">
+                <div class="card-body text-center">
+                    <div class="stat-icon bg-secondary text-white mx-auto mb-3">
+                        <i class="fas fa-lira-sign"></i>
+                    </div>
+                    <h3 class="fw-bold text-secondary">@Model.TotalRevenue.ToString("N0") TL</h3>
+                    <p class="text-muted mb-0">Toplam Gelir</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h4 class="mb-3"><i class="fas fa-bolt me-2 text-warning"></i>Hizli Islemler</h4>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <a href="@Url.Action("Index", "Restaurant")" class="quick-action d-block bg-primary">
+                <i class="fas fa-store fa-2x mb-2"></i>
+                <h5 class="mb-0">Restoranlari Yonet</h5>
+            </a>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <a href="@Url.Action("Index", "Food")" class="quick-action d-block bg-success">
+                <i class="fas fa-utensils fa-2x mb-2"></i>
+                <h5 class="mb-0">Yemekleri Yonet</h5>
+            </a>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <a href="@Url.Action("Orders", "Admin")" class="quick-action d-block bg-warning">
+                <i class="fas fa-shopping-bag fa-2x mb-2"></i>
+                <h5 class="mb-0">Siparisleri Gor</h5>
+            </a>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <a href="@Url.Action("Customers", "Admin")" class="quick-action d-block bg-info">
+                <i class="fas fa-users fa-2x mb-2"></i>
+                <h5 class="mb-0">Musterileri Gor</h5>
+            </a>
+        </div>
+    </div>
+
+    <!-- Management Sections -->
+    <div class="row">
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-store me-2"></i>Restoran Yonetimi</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Restoranlari ekleyin, duzenleyin veya silin.</p>
+                    <a href="@Url.Action("Create", "Restaurant")" class="btn btn-outline-primary me-2">
+                        <i class="fas fa-plus me-1"></i>Yeni Restoran
+                    </a>
+                    <a href="@Url.Action("Index", "Restaurant")" class="btn btn-primary">
+                        <i class="fas fa-list me-1"></i>Tum Restoranlar
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-utensils me-2"></i>Yemek Yonetimi</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Yemekleri ekleyin, duzenleyin veya silin.</p>
+                    <a href="@Url.Action("Create", "Food")" class="btn btn-outline-success me-2">
+                        <i class="fas fa-plus me-1"></i>Yeni Yemek
+                    </a>
+                    <a href="@Url.Action("Index", "Food")" class="btn btn-success">
+                        <i class="fas fa-list me-1"></i>Tum Yemekler
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="fas fa-shopping-cart me-2"></i>Siparis Yonetimi</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Siparisleri goruntuleyin ve durumlarini guncelleyin.</p>
+                    <a href="@Url.Action("Orders", "Admin")" class="btn btn-warning">
+                        <i class="fas fa-eye me-1"></i>Siparisleri Gor
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Raporlar</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Satis ve performans raporlarini inceleyin.</p>
+                    <a href="@Url.Action("Reports", "Admin")" class="btn btn-info text-white">
+                        <i class="fas fa-chart-line me-1"></i>Raporlari Gor
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

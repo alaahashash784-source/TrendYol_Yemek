@@ -1,0 +1,273 @@
+@*
+    صفحة تفاصيل الطعام - تعرض معلومات طعام واحد مع زر الإضافة للسلة
+    Controller: FoodController.cs → Action: Details(id)
+    الربط: AddToCart يرسل AJAX إلى OrderPage/AddToCart
+*@
+@model mvc_full.Models.Yemek
+
+@{
+    ViewBag.Title = Model.Ad + " - Detaylar";
+    bool isAdmin = Session["IsAdmin"] != null && (bool)Session["IsAdmin"];
+    string foodImage = GetFoodImage(Model.Ad, Model.Aciklama, Model.ResimUrl);
+}
+
+@functions {
+    string GetFoodImage(string foodName, string description, string resimUrl)
+    {
+        // ÖNCELİKLE: Eğer kullanıcı kendi resim URL'sini girdiyse, onu kullan!
+        if (!string.IsNullOrEmpty(resimUrl) && resimUrl.StartsWith("http"))
+        {
+            return resimUrl;
+        }
+        
+        // Yemek adı ve açıklamasına göre uygun resim seç (sadece resimUrl boşsa)
+        string searchText = ((foodName ?? "") + " " + (description ?? "")).ToLower();
+        
+        // Tatlılar - EN ÖNCE kontrol et
+        if (searchText.Contains("baklava"))
+            return "https://images.unsplash.com/photo-1598110750624-207050c4f28c?w=800";
+        if (searchText.Contains("kunefe") || searchText.Contains("künefe") || searchText.Contains("kadayif"))
+            return "https://images.pexels.com/photos/14705223/pexels-photo-14705223.jpeg?w=800";
+        if (searchText.Contains("lokum") || searchText.Contains("turkish delight") || searchText.Contains("delight"))
+            return "https://images.unsplash.com/photo-1590080875515-8a3a8dc5735e?w=800";
+        if (searchText.Contains("sutlac") || searchText.Contains("sütlaç") || searchText.Contains("rice pudding"))
+            return "https://images.unsplash.com/photo-1488477181946-6428a0291777?w=800";
+        if (searchText.Contains("tiramisu"))
+            return "https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=800";
+        if (searchText.Contains("cheesecake"))
+            return "https://images.unsplash.com/photo-1533134242443-d4fd215305ad?w=800";
+        if (searchText.Contains("brownie") || searchText.Contains("chocolate"))
+            return "https://images.unsplash.com/photo-1564355808539-22fda35bed7e?w=800";
+        if (searchText.Contains("dondurma") || searchText.Contains("ice cream"))
+            return "https://images.unsplash.com/photo-1497034825429-c343d7c6a68f?w=800";
+        if (searchText.Contains("tatli") || searchText.Contains("dessert") || searchText.Contains("sweet"))
+            return "https://images.unsplash.com/photo-1551024601-bec78aea704b?w=800";
+        
+        // Kebap ve Et çeşitleri
+        if (searchText.Contains("mixed grill") || searchText.Contains("karisik izgara") || searchText.Contains("mixed"))
+            return "https://images.unsplash.com/photo-1544025162-d76694265947?w=800";
+        if (searchText.Contains("chicken shish") || searchText.Contains("tavuk sis") || searchText.Contains("shish"))
+            return "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=800";
+        if (searchText.Contains("iskender"))
+            return "https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=800";
+        if (searchText.Contains("adana"))
+            return "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=800";
+        if (searchText.Contains("doner") || searchText.Contains("döner"))
+            return "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=800";
+        if (searchText.Contains("kebab") || searchText.Contains("kebap"))
+            return "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=800";
+        if (searchText.Contains("kofte") || searchText.Contains("köfte") || searchText.Contains("meatball"))
+            return "https://images.unsplash.com/photo-1529042410759-befb1204b468?w=800";
+        if (searchText.Contains("steak") || searchText.Contains("biftek"))
+            return "https://images.unsplash.com/photo-1600891964092-4316c288032e?w=800";
+        
+        // Pizza çeşitleri
+        if (searchText.Contains("margherita"))
+            return "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=800";
+        if (searchText.Contains("pepperoni"))
+            return "https://images.unsplash.com/photo-1628840042765-356cda07504e?w=800";
+        if (searchText.Contains("vegetarian") || searchText.Contains("vejeteryan") || searchText.Contains("veggie"))
+            return "https://images.unsplash.com/photo-1571407970349-bc81e7e96d47?w=800";
+        if (searchText.Contains("sucuk"))
+            return "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800";
+        if (searchText.Contains("hawaii") || searchText.Contains("ananas"))
+            return "https://images.unsplash.com/photo-1565299624946-b28f40a0ae95?w=800";
+        if (searchText.Contains("pizza"))
+            return "https://images.unsplash.com/photo-1593560708920-61dd98c46a4e?w=800";
+        
+        // Burger çeşitleri
+        if (searchText.Contains("cheese burger") || searchText.Contains("cheeseburger"))
+            return "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800";
+        if (searchText.Contains("chicken burger") || searchText.Contains("tavuk burger"))
+            return "https://images.unsplash.com/photo-1553979459-d2229ba7433a?w=800";
+        if (searchText.Contains("double") || searchText.Contains("duble"))
+            return "https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=800";
+        if (searchText.Contains("burger"))
+            return "https://images.unsplash.com/photo-1550547660-d9450f859349?w=800";
+        
+        // Balık ve deniz ürünleri
+        if (searchText.Contains("levrek") || searchText.Contains("sea bass"))
+            return "https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=800";
+        if (searchText.Contains("karides") || searchText.Contains("shrimp"))
+            return "https://images.unsplash.com/photo-1559847844-5315695dadae?w=800";
+        if (searchText.Contains("somon") || searchText.Contains("salmon"))
+            return "https://images.unsplash.com/photo-1485921325833-c519f76c4927?w=800";
+        if (searchText.Contains("balik") || searchText.Contains("fish"))
+            return "https://images.unsplash.com/photo-1485921325833-c519f76c4927?w=800";
+        
+        // Asya mutfağı
+        if (searchText.Contains("sushi"))
+            return "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=800";
+        if (searchText.Contains("pad thai") || searchText.Contains("noodle"))
+            return "https://images.unsplash.com/photo-1591814468924-caf88d1232e1?w=800";
+        if (searchText.Contains("ramen"))
+            return "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=800";
+        
+        // Tavuk
+        if (searchText.Contains("tavuk") || searchText.Contains("chicken"))
+            return "https://images.unsplash.com/photo-1598103442097-8b74394b95c6?w=800";
+        
+        // Diğer
+        if (searchText.Contains("salad") || searchText.Contains("salata"))
+            return "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800";
+        if (searchText.Contains("soup") || searchText.Contains("corba") || searchText.Contains("çorba"))
+            return "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=800";
+        if (searchText.Contains("makarna") || searchText.Contains("spaghetti") || searchText.Contains("pasta"))
+            return "https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=800";
+        
+        // Varsayılan
+        return "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800";
+    }
+}
+
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-6 mb-4">
+            <div class="card border-0 shadow-lg overflow-hidden">
+                <img src="@foodImage" 
+                     class="img-fluid" alt="@Model.Ad" style="max-height: 500px; object-fit: cover; width: 100%;"
+                     onerror="this.src='https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=800'">
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <nav aria-label="breadcrumb" class="mb-3">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">@Html.ActionLink("Ana Sayfa", "Index", "Home")</li>
+                    <li class="breadcrumb-item">@Html.ActionLink("Yemekler", "Index", "Food")</li>
+                    <li class="breadcrumb-item active">@Model.Ad</li>
+                </ol>
+            </nav>
+            
+            <h1 class="display-5 fw-bold mb-3">@Model.Ad</h1>
+            
+            <div class="d-flex align-items-center mb-3">
+                <div class="rating text-warning me-3">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star-half-alt"></i>
+                    <span class="text-muted ms-2">(4.8) - 120 degerlendirme</span>
+                </div>
+            </div>
+            
+            <p class="lead text-muted mb-4">
+                @(string.IsNullOrEmpty(Model.Aciklama) ? "Bu lezzetli yemek taze malzemelerle ozenle hazirlanmistir." : Model.Aciklama)
+            </p>
+            
+            <div class="mb-4">
+                <h2 class="display-6 text-success fw-bold">@Model.Fiyat.ToString("F2") TL</h2>
+            </div>
+            
+            <div class="card bg-light border-0 p-3 mb-4">
+                <div class="row text-center">
+                    <div class="col-4">
+                        <i class="fas fa-clock text-primary fa-2x mb-2"></i>
+                        <p class="mb-0 small">Hazirlanma</p>
+                        <strong>15-20 dk</strong>
+                    </div>
+                    <div class="col-4">
+                        <i class="fas fa-fire text-danger fa-2x mb-2"></i>
+                        <p class="mb-0 small">Kalori</p>
+                        <strong>350 kcal</strong>
+                    </div>
+                    <div class="col-4">
+                        <i class="fas fa-utensils text-warning fa-2x mb-2"></i>
+                        <p class="mb-0 small">Porsiyon</p>
+                        <strong>1 kisi</strong>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="d-flex gap-3 mb-4">
+                <div class="quantity-selector d-flex align-items-center">
+                    <button class="btn btn-primary btn-lg rounded-circle" type="button" id="decreaseQty" style="width: 50px; height: 50px;">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                    <input type="number" class="form-control form-control-lg text-center mx-2 fw-bold" id="quantity" name="miktar" value="1" min="1" max="99" style="width: 80px; font-size: 20px;">
+                    <button class="btn btn-primary btn-lg rounded-circle" type="button" id="increaseQty" style="width: 50px; height: 50px;">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+                <button type="button" class="btn btn-success btn-lg flex-grow-1 add-to-cart-btn" data-food-id="@Model.YemekId">
+                    <i class="fas fa-shopping-cart me-2"></i>Sepete Ekle
+                </button>
+            </div>
+            
+            <div class="d-flex gap-2">
+                @if (isAdmin)
+                {
+                    @Html.ActionLink("Duzenle", "Edit", new { id = Model.YemekId }, new { @class = "btn btn-outline-primary" })
+                    @Html.ActionLink("Sil", "Delete", new { id = Model.YemekId }, new { @class = "btn btn-outline-danger" })
+                }
+                @Html.ActionLink("Geri Don", "Index", null, new { @class = "btn btn-outline-secondary" })
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+<script>
+$(document).ready(function() {
+    // زر زيادة الكمية
+    $('#increaseQty').click(function() {
+        var input = $('#quantity');
+        var currentVal = parseInt(input.val()) || 1;
+        if (currentVal < 99) {
+            input.val(currentVal + 1);
+        }
+    });
+
+    // زر تقليل الكمية
+    $('#decreaseQty').click(function() {
+        var input = $('#quantity');
+        var currentVal = parseInt(input.val()) || 1;
+        if (currentVal > 1) {
+            input.val(currentVal - 1);
+        }
+    });
+
+    // التحقق من الإدخال اليدوي
+    $('#quantity').on('change', function() {
+        var val = parseInt($(this).val()) || 1;
+        if (val < 1) val = 1;
+        if (val > 99) val = 99;
+        $(this).val(val);
+    });
+
+    // إضافة للسلة مع الكمية - استخدام الطريقة العادية
+    $('.add-to-cart-btn').click(function() {
+        var foodId = $(this).data('food-id');
+        var quantity = parseInt($('#quantity').val()) || 1;
+        
+        // الانتقال مباشرة لإضافة المنتج
+        window.location.href = '@Url.Action("AddToCart", "OrderPage")?yemekId=' + foodId + '&miktar=' + quantity;
+    });
+});
+</script>
+}
+
+<style>
+.quantity-selector .btn {
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    transition: all 0.2s ease;
+}
+.quantity-selector .btn:hover {
+    transform: scale(1.1);
+}
+.quantity-selector input {
+    border: 2px solid #dee2e6;
+    border-radius: 10px;
+}
+.quantity-selector input:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+.add-to-cart-btn {
+    transition: all 0.3s ease;
+}
+.add-to-cart-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(25, 135, 84, 0.4);
+}
+</style>

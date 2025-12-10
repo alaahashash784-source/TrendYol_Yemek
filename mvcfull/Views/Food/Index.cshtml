@@ -1,0 +1,240 @@
+@*
+    صفحة عرض جميع الأطعمة - تعرض قائمة الأطعمة من قاعدة البيانات
+    Controller: FoodController.cs → Action: Index()
+    الربط: يستقبل Model من نوع IEnumerable<Yemek> ويعرضه في cards
+*@
+@model IEnumerable<mvc_full.Models.Yemek>
+
+@{
+    ViewBag.Title = "Tum Yemekler";
+    bool isAdmin = Session["IsAdmin"] != null && (bool)Session["IsAdmin"];
+}
+
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold text-primary">
+            <i class="fas fa-utensils text-warning me-3"></i>Tum Yemekler
+        </h1>
+        <p class="lead mb-4">Lezzetli yemeklerimizi kesfedin</p>
+        @if (isAdmin)
+        {
+            @Html.ActionLink("Yeni Yemek Ekle", "Create", null, new { @class = "btn btn-warning btn-lg shadow" })
+        }
+    </div>
+
+    <!-- Search and Filter -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="input-group">
+                <span class="input-group-text bg-primary text-white"><i class="fas fa-search"></i></span>
+                <input type="text" id="searchInput" class="form-control form-control-lg" placeholder="Yemek ara...">
+            </div>
+        </div>
+        <div class="col-md-3">
+            <select class="form-select form-select-lg" id="categoryFilter">
+                <option value="">Tum Kategoriler</option>
+                <option value="pizza">Pizza</option>
+                <option value="kebab">Kebap</option>
+                <option value="dessert">Tatli</option>
+            </select>
+        </div>
+    </div>
+
+    @if (Model.Any())
+    {
+        <div class="row" id="foodGrid">
+            @foreach (var item in Model)
+            {
+                string foodImage = GetFoodImage(item.Ad, item.Aciklama, item.ResimUrl);
+                <div class="col-lg-4 col-md-6 mb-4 food-item" data-name="@item.Ad.ToLower()">
+                    <a href="@Url.Action("Details", "Food", new { id = item.YemekId })" class="text-decoration-none">
+                        <div class="card h-100 shadow-sm border-0 food-card">
+                            <div class="position-relative overflow-hidden" style="height: 200px;">
+                                <img src="@foodImage" 
+                                     class="card-img-top h-100" style="object-fit: cover;" alt="@item.Ad"
+                                     onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600';">
+                                <div class="food-overlay position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="background: rgba(0,0,0,0.5); opacity: 0; transition: 0.3s;">
+                                    <span class="btn btn-light btn-lg">
+                                        <i class="fas fa-eye me-2"></i>Detaylar
+                                    </span>
+                                </div>
+                                <div class="position-absolute top-0 end-0 m-2">
+                                    <span class="badge bg-success fs-6">@item.Fiyat.ToString("F2") TL</span>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title fw-bold text-dark">@item.Ad</h5>
+                                <p class="card-text text-muted mb-2">@(string.IsNullOrEmpty(item.Aciklama) ? "Lezzetli yemek" : item.Aciklama)</p>
+                                
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="rating text-warning">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star-half-alt"></i>
+                                    </div>
+                                    <small class="text-muted">
+                                        <i class="fas fa-clock me-1"></i>15-20 dk
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    @if (isAdmin)
+                    {
+                        <div class="text-center mt-2">
+                            @Html.ActionLink("Duzenle", "Edit", new { id = item.YemekId }, new { @class = "btn btn-outline-primary btn-sm" })
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    }
+    
+    @functions {
+        string GetFoodImage(string foodName, string description, string resimUrl)
+        {
+            // ÖNCELİKLE: Eğer kullanıcı kendi resim URL'sini girdiyse, onu kullan!
+            if (!string.IsNullOrEmpty(resimUrl) && resimUrl.StartsWith("http"))
+            {
+                return resimUrl;
+            }
+            
+            // Yemek adı ve açıklamasına göre uygun resim seç (sadece resimUrl boşsa)
+            string searchText = ((foodName ?? "") + " " + (description ?? "")).ToLower();
+            
+            // Tatlılar - EN ÖNCE kontrol et
+            if (searchText.Contains("baklava"))
+                return "https://images.unsplash.com/photo-1598110750624-207050c4f28c?w=600";
+            if (searchText.Contains("kunefe") || searchText.Contains("künefe") || searchText.Contains("kadayif"))
+                return "https://images.pexels.com/photos/14705223/pexels-photo-14705223.jpeg?w=600";
+            if (searchText.Contains("lokum") || searchText.Contains("turkish delight") || searchText.Contains("delight"))
+                return "https://images.unsplash.com/photo-1590080875515-8a3a8dc5735e?w=600";
+            if (searchText.Contains("sutlac") || searchText.Contains("sütlaç") || searchText.Contains("rice pudding"))
+                return "https://images.unsplash.com/photo-1488477181946-6428a0291777?w=600";
+            if (searchText.Contains("tiramisu"))
+                return "https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=600";
+            if (searchText.Contains("cheesecake"))
+                return "https://images.unsplash.com/photo-1533134242443-d4fd215305ad?w=600";
+            if (searchText.Contains("brownie") || searchText.Contains("chocolate"))
+                return "https://images.unsplash.com/photo-1564355808539-22fda35bed7e?w=600";
+            if (searchText.Contains("dondurma") || searchText.Contains("ice cream"))
+                return "https://images.unsplash.com/photo-1497034825429-c343d7c6a68f?w=600";
+            if (searchText.Contains("tatli") || searchText.Contains("dessert") || searchText.Contains("sweet"))
+                return "https://images.unsplash.com/photo-1551024601-bec78aea704b?w=600";
+            
+            // Kebap ve Et çeşitleri
+            if (searchText.Contains("mixed grill") || searchText.Contains("karisik izgara") || searchText.Contains("mixed"))
+                return "https://images.unsplash.com/photo-1544025162-d76694265947?w=600";
+            if (searchText.Contains("chicken shish") || searchText.Contains("tavuk sis") || searchText.Contains("shish"))
+                return "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=600";
+            if (searchText.Contains("iskender"))
+                return "https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=600";
+            if (searchText.Contains("adana"))
+                return "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=600";
+            if (searchText.Contains("doner") || searchText.Contains("döner"))
+                return "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=600";
+            if (searchText.Contains("kebab") || searchText.Contains("kebap"))
+                return "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=600";
+            if (searchText.Contains("kofte") || searchText.Contains("köfte") || searchText.Contains("meatball"))
+                return "https://images.unsplash.com/photo-1529042410759-befb1204b468?w=600";
+            if (searchText.Contains("steak") || searchText.Contains("biftek"))
+                return "https://images.unsplash.com/photo-1600891964092-4316c288032e?w=600";
+            
+            // Pizza çeşitleri
+            if (searchText.Contains("margherita"))
+                return "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=600";
+            if (searchText.Contains("pepperoni"))
+                return "https://images.unsplash.com/photo-1628840042765-356cda07504e?w=600";
+            if (searchText.Contains("vegetarian") || searchText.Contains("vejeteryan") || searchText.Contains("veggie"))
+                return "https://images.unsplash.com/photo-1571407970349-bc81e7e96d47?w=600";
+            if (searchText.Contains("sucuk"))
+                return "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=600";
+            if (searchText.Contains("hawaii") || searchText.Contains("ananas"))
+                return "https://images.unsplash.com/photo-1565299624946-b28f40a0ae95?w=600";
+            if (searchText.Contains("pizza"))
+                return "https://images.unsplash.com/photo-1593560708920-61dd98c46a4e?w=600";
+            
+            // Burger çeşitleri
+            if (searchText.Contains("cheese burger") || searchText.Contains("cheeseburger"))
+                return "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600";
+            if (searchText.Contains("chicken burger") || searchText.Contains("tavuk burger"))
+                return "https://images.unsplash.com/photo-1553979459-d2229ba7433a?w=600";
+            if (searchText.Contains("double") || searchText.Contains("duble"))
+                return "https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=600";
+            if (searchText.Contains("burger"))
+                return "https://images.unsplash.com/photo-1550547660-d9450f859349?w=600";
+            
+            // Balık ve deniz ürünleri
+            if (searchText.Contains("levrek") || searchText.Contains("sea bass"))
+                return "https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=600";
+            if (searchText.Contains("karides") || searchText.Contains("shrimp"))
+                return "https://images.unsplash.com/photo-1559847844-5315695dadae?w=600";
+            if (searchText.Contains("somon") || searchText.Contains("salmon"))
+                return "https://images.unsplash.com/photo-1485921325833-c519f76c4927?w=600";
+            if (searchText.Contains("balik") || searchText.Contains("fish"))
+                return "https://images.unsplash.com/photo-1485921325833-c519f76c4927?w=600";
+            
+            // Asya mutfağı
+            if (searchText.Contains("sushi"))
+                return "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=600";
+            if (searchText.Contains("pad thai") || searchText.Contains("noodle"))
+                return "https://images.unsplash.com/photo-1591814468924-caf88d1232e1?w=600";
+            if (searchText.Contains("ramen"))
+                return "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=600";
+            
+            // Tavuk
+            if (searchText.Contains("tavuk") || searchText.Contains("chicken"))
+                return "https://images.unsplash.com/photo-1598103442097-8b74394b95c6?w=600";
+            
+            // Diğer
+            if (searchText.Contains("salad") || searchText.Contains("salata"))
+                return "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600";
+            if (searchText.Contains("soup") || searchText.Contains("corba") || searchText.Contains("çorba"))
+                return "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=600";
+            if (searchText.Contains("makarna") || searchText.Contains("spaghetti") || searchText.Contains("pasta"))
+                return "https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=600";
+            
+            // Varsayılan
+            return "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600";
+        }
+    }
+    else
+    {
+        <div class="text-center py-5">
+            <i class="fas fa-utensils fa-5x text-muted mb-4"></i>
+            <h3 class="text-muted mb-3">Henuz yemek eklenmemis</h3>
+            <p class="text-muted mb-4">Ilk yemegi ekleyin</p>
+            @if (isAdmin)
+            {
+                @Html.ActionLink("Yemek Ekle", "Create", null, new { @class = "btn btn-primary btn-lg" })
+            }
+        </div>
+    }
+</div>
+
+<style>
+    .food-card:hover .food-overlay { opacity: 1 !important; }
+    .food-card { transition: transform 0.3s; cursor: pointer; }
+    .food-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important; }
+</style>
+
+@section scripts {
+    <script>
+        $(document).ready(function() {
+            // Search functionality
+            $('#searchInput').on('keyup', function() {
+                var searchText = $(this).val().toLowerCase();
+                $('.food-item').each(function() {
+                    var foodName = $(this).data('name');
+                    if (foodName && foodName.includes(searchText)) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                    }
+                });
+            });
+        });
+    </script>
+}

@@ -1,0 +1,431 @@
+﻿@*
+    التخطيط الرئيسي للموقع - يحتوي على القائمة العلوية والتذييل
+    يستخدم من جميع الصفحات عبر Layout = "~/Views/Shared/_Layout.cshtml"
+    الربط: Html.ActionLink للتنقل بين Controllers مختلفة
+*@
+<!DOCTYPE html>
+<html lang="tr" dir="ltr">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - TrendYol Yemek</title>
+    
+    <!-- Bootstrap 5 CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- External CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    @RenderSection("styles", required: false)
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/Content/images/favicon.ico">
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="TrendYol Yemek - En lezzetli yemekler hizli ve guvenli teslimat">
+    <meta name="keywords" content="yemek, teslimat, restoranlar, turkiye, TrendYol">
+    <meta name="author" content="TrendYol Yemek">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="TrendYol Yemek - Kapiniza Kadar">
+    <meta property="og:description" content="En iyi restoranlardan en lezzetli yemekleri kesfedin">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="@Request.Url.AbsoluteUri">
+    <meta property="og:image" content="/Content/images/og-image.jpg">
+    
+    <style>
+        /* Force LTR layout */
+        html, body { direction: ltr !important; text-align: left !important; }
+        .row { flex-direction: row !important; }
+        .navbar-nav { flex-direction: row !important; }
+    </style>
+</head>
+<body style="direction: ltr !important; text-align: left !important;">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top" style="direction: ltr !important;">
+        <div class="container" style="flex-direction: row !important;">
+            <!-- Brand -->
+            @Html.ActionLink("TrendYol Yemek", "Index", "Home", new { area = "" }, new { @class = "navbar-brand fw-bold" })
+            
+            <!-- Mobile Toggle -->
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <!-- Navigation Links -->
+            <div class="collapse navbar-collapse" id="navbarNav" style="flex-direction: row !important;">
+                <ul class="navbar-nav me-auto" style="flex-direction: row !important;">
+                    <li class="nav-item">
+                        @Html.ActionLink("Ana Sayfa", "Index", "Home", new { area = "" }, new { @class = "nav-link" })
+                    </li>
+                    <li class="nav-item">
+                        @Html.ActionLink("Restoranlar", "Index", "Restaurant", new { area = "" }, new { @class = "nav-link" })
+                    </li>
+                    <li class="nav-item">
+                        @Html.ActionLink("Yemekler", "Index", "Food", new { area = "" }, new { @class = "nav-link" })
+                    </li>
+                    <li class="nav-item">
+                        @Html.ActionLink("Hakkimizda", "About", "Home", new { area = "" }, new { @class = "nav-link" })
+                    </li>
+                    <li class="nav-item">
+                        @Html.ActionLink("Iletisim", "Contact", "Home", new { area = "" }, new { @class = "nav-link" })
+                    </li>
+                    @if (Session["IsAdmin"] != null && (bool)Session["IsAdmin"])
+                    {
+                        <li class="nav-item">
+                            @Html.ActionLink("Admin Panel", "Index", "Admin", new { area = "" }, new { @class = "nav-link text-warning" })
+                        </li>
+                    }
+                </ul>
+                
+                <!-- User Menu -->
+                <ul class="navbar-nav">
+                    @if (Session["MusteriId"] != null)
+                    {
+                        <li class="nav-item dropdown">
+                            @{
+                                var cartItems = Session["CartItems"] as List<mvc_full.Models.CartItemViewModel>;
+                                int sepetCount = cartItems != null ? cartItems.Sum(x => x.Miktar) : 0;
+                            }
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-shopping-cart me-2"></i>
+                                Sepet
+                                <span class="badge bg-warning text-dark ms-1" id="cart-count">@sepetCount</span>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-end p-3" style="min-width: 320px;" id="cart-preview-dropdown">
+                                <div id="cart-preview">
+                                    <div class="text-center p-3">
+                                        <i class="fas fa-shopping-cart fa-2x text-muted mb-2"></i>
+                                        <p class="text-muted mb-0">Sepet bos</p>
+                                    </div>
+                                </div>
+                                <div class="d-grid mt-3">
+                                    @Html.ActionLink("Sepeti Gor", "Index", "OrderPage", null, new { @class = "btn btn-primary btn-sm" })
+                                </div>
+                            </div>
+                        </li>
+                        
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user-circle me-2"></i>
+                                @Session["MusteriAd"]
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-end">
+                                @Html.ActionLink("Profilim", "Profile", "Account", null, new { @class = "dropdown-item" })
+                                @Html.ActionLink("Siparislerim", "Orders", "Account", null, new { @class = "dropdown-item" })
+                                @if (Session["IsAdmin"] != null && (bool)Session["IsAdmin"])
+                                {
+                                    <hr class="dropdown-divider">
+                                    @Html.ActionLink("Admin Panel", "Index", "Admin", null, new { @class = "dropdown-item text-warning" })
+                                }
+                                <hr class="dropdown-divider">
+                                @Html.ActionLink("Cikis Yap", "Logout", "Account", null, new { @class = "dropdown-item text-danger" })
+                            </div>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a href="/AdminLogin.aspx" class="nav-link" title="Admin Girisi" style="opacity: 0.3;">
+                                <i class="fas fa-user-shield"></i>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            @Html.ActionLink("Giris Yap", "Login", "Account", null, new { @class = "nav-link" })
+                        </li>
+                        <li class="nav-item">
+                            @Html.ActionLink("Kayit Ol", "Register", "Account", null, new { @class = "btn btn-primary btn-sm ms-2" })
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content" style="padding-top: 80px;">
+        <!-- Alert Messages -->
+        @if (TempData["Message"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show m-3" role="alert">
+                <i class="fas fa-check-circle me-2"></i>
+                @TempData["Message"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show m-3" role="alert">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                @TempData["Error"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        @RenderBody()
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer bg-dark text-light py-5 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <h5 class="fw-bold mb-3">
+                        <i class="fas fa-utensils text-warning me-2"></i>
+                        TrendYol Yemek
+                    </h5>
+                    <p class="text-light-50">
+                        Turkiye'nin oncu yemek teslimat platformu. En iyi restoranlardan en lezzetli yemekleri hizli ve guvenli teslimat ile sunuyoruz.
+                    </p>
+                    <div class="social-links">
+                        <a href="#" class="text-light me-3"><i class="fab fa-facebook fa-lg"></i></a>
+                        <a href="#" class="text-light me-3"><i class="fab fa-twitter fa-lg"></i></a>
+                        <a href="#" class="text-light me-3"><i class="fab fa-instagram fa-lg"></i></a>
+                        <a href="#" class="text-light"><i class="fab fa-youtube fa-lg"></i></a>
+                    </div>
+                </div>
+                
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h6 class="fw-bold mb-3">Hizli Linkler</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">@Html.ActionLink("Ana Sayfa", "Index", "Home", null, new { @class = "text-light-50" })</li>
+                        <li class="mb-2">@Html.ActionLink("Restoranlar", "Index", "Restaurant", null, new { @class = "text-light-50" })</li>
+                        <li class="mb-2">@Html.ActionLink("Yemekler", "Index", "Food", null, new { @class = "text-light-50" })</li>
+                        <li class="mb-2">@Html.ActionLink("Hakkimizda", "About", "Home", null, new { @class = "text-light-50" })</li>
+                        <li class="mb-2">@Html.ActionLink("Admin Panel", "Index", "Admin", null, new { @class = "text-warning" })</li>
+                    </ul>
+                </div>
+                
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h6 class="fw-bold mb-3">Destek</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#" class="text-light-50">Yardim Merkezi</a></li>
+                        <li class="mb-2"><a href="#" class="text-light-50">Sikca Sorulan Sorular</a></li>
+                        <li class="mb-2"><a href="#" class="text-light-50">Iletisim</a></li>
+                        <li class="mb-2"><a href="#" class="text-light-50">Sikayet</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <h6 class="fw-bold mb-3">Bize Ulasin</h6>
+                    <p class="text-light-50 mb-3">Kampanya ve guncellemeler icin abone olun</p>
+                    <form class="d-flex">
+                        <input type="email" class="form-control me-2" placeholder="E-posta">
+                        <button class="btn btn-warning" type="submit">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+                    <div class="app-download mt-3">
+                        <p class="text-light-50 mb-2">Uygulamayi Simdi Indirin</p>
+                        <div class="d-flex flex-wrap gap-2">
+                            <a href="#" class="d-inline-block">
+                                <img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" 
+                                     alt="App Store" 
+                                     style="height: 40px; width: auto;"
+                                     onerror="this.style.display='none'">
+                            </a>
+                            <a href="#" class="d-inline-block">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" 
+                                     alt="Google Play" 
+                                     style="height: 40px; width: auto;"
+                                     onerror="this.style.display='none'">
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <hr class="my-4">
+            
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <p class="text-light-50 mb-0">
+                        &copy; @DateTime.Now.Year TrendYol Yemek. Tum haklar saklidir.
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <a href="#" class="text-light-50 me-3">Gizlilik Politikasi</a>
+                    <a href="#" class="text-light-50 me-3">Kullanim Kosullari</a>
+                    <a href="#" class="text-light-50">Cerezler</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <button id="backToTop" class="btn btn-primary position-fixed bottom-0 end-0 m-4 rounded-circle d-none" style="z-index: 1000;">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        $(document).ready(function() {
+            // Initialize cart count
+            updateCartCount();
+            
+            // Back to top button
+            $(window).scroll(function() {
+                if ($(this).scrollTop() > 300) {
+                    $('#backToTop').removeClass('d-none');
+                } else {
+                    $('#backToTop').addClass('d-none');
+                }
+            });
+            
+            $('#backToTop').click(function() {
+                $('html, body').animate({scrollTop: 0}, 600);
+                return false;
+            });
+            
+            // Auto-hide alerts
+            setTimeout(function() {
+                $('.alert').alert('close');
+            }, 5000);
+            
+            // Navbar scroll effect
+            $(window).scroll(function() {
+                if ($(this).scrollTop() > 50) {
+                    $('.navbar').addClass('navbar-scrolled');
+                } else {
+                    $('.navbar').removeClass('navbar-scrolled');
+                }
+            });
+
+            // Global Add to Cart functionality
+            $(document).on('click', '.add-to-cart-btn, .add-to-cart-main', function(e) {
+                e.preventDefault();
+                
+                var foodId = $(this).data('food-id');
+                var quantity = 1;
+                
+                // Try to get quantity from nearby input
+                var qtyInput = $(this).closest('.card, .food-item').find('.qty-input[data-food-id="' + foodId + '"]');
+                if (qtyInput.length) {
+                    quantity = parseInt(qtyInput.val()) || 1;
+                }
+
+                addToCart(foodId, quantity);
+            });
+
+            // Update cart preview when dropdown is shown
+            $('#cart-preview-dropdown').on('show.bs.dropdown', function () {
+                updateCartPreview();
+            });
+
+            // Quantity controls
+            $(document).on('click', '.increase-qty', function() {
+                var foodId = $(this).data('food-id');
+                var qtyInput = $(this).siblings('.qty-input[data-food-id="' + foodId + '"]');
+                var currentQty = parseInt(qtyInput.val()) || 1;
+                if (currentQty < 10) {
+                    qtyInput.val(currentQty + 1);
+                }
+            });
+
+            $(document).on('click', '.decrease-qty', function() {
+                var foodId = $(this).data('food-id');
+                var qtyInput = $(this).siblings('.qty-input[data-food-id="' + foodId + '"]');
+                var currentQty = parseInt(qtyInput.val()) || 1;
+                if (currentQty > 1) {
+                    qtyInput.val(currentQty - 1);
+                }
+            });
+        });
+
+        // Add to cart function
+        function addToCart(foodId, quantity) {
+            $.ajax({
+                url: '@Url.Action("AddToCartAjax", "OrderPage")',
+                type: 'POST',
+                data: {
+                    yemekId: foodId,
+                    miktar: quantity,
+                    __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                },
+                success: function(result) {
+                    if (result.success) {
+                        // Update cart count
+                        $('#cart-count').text(result.cartCount);
+                        
+                        // Show success toast
+                        showToast(result.message, 'success');
+                        
+                        // Update cart preview
+                        updateCartPreview();
+                        
+                        // Animate cart icon
+                        animateCartIcon();
+                    } else {
+                        showToast(result.message, 'error');
+                    }
+                },
+                error: function() {
+                    showToast('حدث خطأ أثناء إضافة المنتج', 'error');
+                }
+            });
+        }
+
+        // Update cart count
+        function updateCartCount() {
+            $.ajax({
+                url: '@Url.Action("GetCartCount", "OrderPage")',
+                type: 'GET',
+                success: function(result) {
+                    $('#cart-count').text(result.count);
+                }
+            });
+        }
+
+        // Update cart preview
+        function updateCartPreview() {
+            $.ajax({
+                url: '@Url.Action("GetCartPreview", "OrderPage")',
+                type: 'GET',
+                success: function(data) {
+                    $('#cart-preview').html(data);
+                },
+                error: function() {
+                    $('#cart-preview').html('<p class="text-muted text-center">حدث خطأ في تحميل السلة</p>');
+                }
+            });
+        }
+
+        // Animate cart icon
+        function animateCartIcon() {
+            $('.fa-shopping-cart').addClass('animate__animated animate__bounce');
+            setTimeout(function() {
+                $('.fa-shopping-cart').removeClass('animate__animated animate__bounce');
+            }, 1000);
+        }
+
+        // Toast notification function
+        function showToast(message, type) {
+            var bgClass = type === 'success' ? 'bg-success' : 
+                         type === 'warning' ? 'bg-warning' : 
+                         type === 'info' ? 'bg-info' : 'bg-danger';
+            
+            var toast = $('<div class="toast align-items-center text-white ' + bgClass + ' border-0 position-fixed" style="top: 100px; left: 20px; z-index: 1055;">' +
+                '<div class="d-flex"><div class="toast-body">' + message + '</div>' +
+                '<button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button></div></div>');
+            
+            $('body').append(toast);
+            var toastInstance = new bootstrap.Toast(toast[0]);
+            toastInstance.show();
+            
+            setTimeout(function() {
+                toast.remove();
+            }, 3000);
+        }
+    </script>
+    @RenderSection("scripts", required: false)
+</body>
+</html>

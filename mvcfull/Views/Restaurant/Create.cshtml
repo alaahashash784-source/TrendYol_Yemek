@@ -1,0 +1,73 @@
+@*
+    صفحة إضافة مطعم جديد - نموذج إدخال بيانات المطعم (للمدير فقط)
+    Controller: RestaurantController.cs → Action: Create()
+    الربط: Html.BeginForm يرسل POST لحفظ المطعم في DB
+*@
+@model mvc_full.Models.Restoran
+
+@{
+    ViewBag.Title = "Yeni Restoran Ekle";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-primary text-white py-4">
+                    <h3 class="mb-0"><i class="fas fa-plus-circle me-2"></i>Yeni Restoran Ekle</h3>
+                </div>
+                <div class="card-body p-5">
+                    @using (Html.BeginForm())
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Restoran Adi *</label>
+                            @Html.EditorFor(model => model.Ad, new { htmlAttributes = new { @class = "form-control form-control-lg", placeholder = "Ornek: Pizza House" } })
+                            @Html.ValidationMessageFor(model => model.Ad, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Aciklama</label>
+                            @Html.TextAreaFor(model => model.Aciklama, new { @class = "form-control", rows = 3, placeholder = "Restoran hakkinda kisa aciklama..." })
+                            @Html.ValidationMessageFor(model => model.Aciklama, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Adres</label>
+                            @Html.EditorFor(model => model.Adres, new { htmlAttributes = new { @class = "form-control", placeholder = "Tam adres..." } })
+                            @Html.ValidationMessageFor(model => model.Adres, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label fw-bold">Telefon</label>
+                                @Html.EditorFor(model => model.Telefon, new { htmlAttributes = new { @class = "form-control", placeholder = "0555 555 5555" } })
+                                @Html.ValidationMessageFor(model => model.Telefon, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label fw-bold">E-posta</label>
+                                @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control", placeholder = "info@restoran.com" } })
+                                @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Resim URL</label>
+                            @Html.EditorFor(model => model.ResimUrl, new { htmlAttributes = new { @class = "form-control", placeholder = "https://..." } })
+                            @Html.ValidationMessageFor(model => model.ResimUrl, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="d-flex gap-3">
+                            <button type="submit" class="btn btn-success btn-lg px-5">
+                                <i class="fas fa-save me-2"></i>Kaydet
+                            </button>
+                            @Html.ActionLink("Iptal", "Index", null, new { @class = "btn btn-outline-secondary btn-lg px-5" })
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

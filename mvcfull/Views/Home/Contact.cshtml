@@ -1,0 +1,121 @@
+﻿@{
+    ViewBag.Title = "Iletisim";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            
+            <!-- Header -->
+            <div class="text-center mb-5">
+                <h1 class="display-4 fw-bold text-primary">
+                    <i class="fas fa-envelope me-3"></i>Iletisim
+                </h1>
+                <p class="lead text-muted">Bizimle iletisime gecin, size yardimci olmaktan mutluluk duyariz!</p>
+                <hr class="w-25 mx-auto border-primary border-2">
+            </div>
+
+            <div class="row g-4">
+                <!-- Adres Karti -->
+                <div class="col-md-6">
+                    <div class="card h-100 border-0 shadow-sm hover-shadow">
+                        <div class="card-body text-center p-4">
+                            <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                <i class="fas fa-map-marker-alt fa-2x text-primary"></i>
+                            </div>
+                            <h5 class="card-title fw-bold">Adresimiz</h5>
+                            <p class="text-muted mb-0">
+                                TrendYol Yemek Merkezi<br>
+                                Istanbul, Turkiye 34000<br>
+                                Levent Plaza, Kat 5
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Telefon Karti -->
+                <div class="col-md-6">
+                    <div class="card h-100 border-0 shadow-sm hover-shadow">
+                        <div class="card-body text-center p-4">
+                            <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                <i class="fas fa-phone-alt fa-2x text-success"></i>
+                            </div>
+                            <h5 class="card-title fw-bold">Telefon</h5>
+                            <p class="text-muted mb-1">
+                                <i class="fas fa-headset me-2"></i>Musteri Hizmetleri
+                            </p>
+                            <a href="tel:+902125550100" class="h5 text-decoration-none text-success">
+                                +90 212 555 01 00
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Email Karti -->
+                <div class="col-md-6">
+                    <div class="card h-100 border-0 shadow-sm hover-shadow">
+                        <div class="card-body text-center p-4">
+                            <div class="bg-info bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                <i class="fas fa-envelope fa-2x text-info"></i>
+                            </div>
+                            <h5 class="card-title fw-bold">E-posta</h5>
+                            <p class="mb-1">
+                                <strong>Destek:</strong><br>
+                                <a href="mailto:destek@trendyolyemek.com" class="text-info text-decoration-none">
+                                    destek@trendyolyemek.com
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Calisma Saatleri -->
+                <div class="col-md-6">
+                    <div class="card h-100 border-0 shadow-sm hover-shadow">
+                        <div class="card-body text-center p-4">
+                            <div class="bg-warning bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                <i class="fas fa-clock fa-2x text-warning"></i>
+                            </div>
+                            <h5 class="card-title fw-bold">Calisma Saatleri</h5>
+                            <p class="text-muted mb-0">
+                                <i class="fas fa-check-circle text-success me-1"></i> Pazartesi - Cuma: 09:00 - 22:00<br>
+                                <i class="fas fa-check-circle text-success me-1"></i> Cumartesi - Pazar: 10:00 - 23:00
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sosyal Medya -->
+            <div class="text-center mt-5">
+                <h5 class="mb-3">Bizi Takip Edin</h5>
+                <div class="d-flex justify-content-center gap-3">
+                    <a href="#" class="btn btn-outline-primary btn-lg rounded-circle">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="#" class="btn btn-outline-info btn-lg rounded-circle">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="#" class="btn btn-outline-danger btn-lg rounded-circle">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="#" class="btn btn-outline-success btn-lg rounded-circle">
+                        <i class="fab fa-whatsapp"></i>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<style>
+    .hover-shadow:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 1rem 3rem rgba(0,0,0,.175) !important;
+        transition: all 0.3s ease;
+    }
+    .card {
+        transition: all 0.3s ease;
+    }
+</style>

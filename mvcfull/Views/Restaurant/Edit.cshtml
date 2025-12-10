@@ -1,0 +1,216 @@
+@model mvc_full.Models.Restoran
+
+@{
+    ViewBag.Title = "Restoran Duzenle";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-primary text-white py-4">
+                    <h3 class="mb-0 text-center">
+                        <i class="fas fa-edit me-2"></i>
+                        Restoran Duzenle
+                    </h3>
+                </div>
+                <div class="card-body p-5">
+                    @using (Html.BeginForm("Edit", "Restaurant", FormMethod.Post, new { @class = "needs-validation" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.HiddenFor(model => model.RestoranId)
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-store text-primary me-1"></i>Restoran Adi *
+                                </label>
+                                @Html.TextBoxFor(model => model.Ad, new { @class = "form-control form-control-lg", placeholder = "Restoran adini girin", required = "required" })
+                                @Html.ValidationMessageFor(model => model.Ad, "", new { @class = "text-danger small" })
+                            </div>
+                            
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-phone text-success me-1"></i>Telefon
+                                </label>
+                                @Html.TextBoxFor(model => model.Telefon, new { @class = "form-control form-control-lg", placeholder = "0555 555 5555" })
+                                @Html.ValidationMessageFor(model => model.Telefon, "", new { @class = "text-danger small" })
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-envelope text-info me-1"></i>E-posta
+                            </label>
+                            @Html.TextBoxFor(model => model.Email, new { @class = "form-control form-control-lg", type = "email", placeholder = "restoran@example.com" })
+                            @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger small" })
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-map-marker-alt text-danger me-1"></i>Adres
+                            </label>
+                            @Html.TextAreaFor(model => model.Adres, new { @class = "form-control", rows = "2", placeholder = "Restoran adresi" })
+                            @Html.ValidationMessageFor(model => model.Adres, "", new { @class = "text-danger small" })
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-align-left text-warning me-1"></i>Aciklama
+                            </label>
+                            @Html.TextAreaFor(model => model.Aciklama, new { @class = "form-control", rows = "3", placeholder = "Restoran hakkinda kisa aciklama" })
+                            @Html.ValidationMessageFor(model => model.Aciklama, "", new { @class = "text-danger small" })
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-image text-secondary me-1"></i>Resim URL
+                            </label>
+                            @Html.TextBoxFor(model => model.ResimUrl, new { @class = "form-control form-control-lg", placeholder = "https://example.com/resim.jpg", id = "resimUrlInput" })
+                            @Html.ValidationMessageFor(model => model.ResimUrl, "", new { @class = "text-danger small" })
+                            <small class="text-muted">Resim URL'sini yapistirin veya asagidaki hazir resimlerden secin</small>
+                        </div>
+                        
+                        <!-- Hazir Resim Secenekleri -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-images text-info me-1"></i>Hazir Resimler (Birini Secin)
+                            </label>
+                            <div class="row g-3" id="imageGallery">
+                                <div class="col-4 col-md-3">
+                                    <div class="image-option" onclick="selectImage('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400')">
+                                        <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=200" class="img-fluid rounded" alt="Restoran 1">
+                                    </div>
+                                </div>
+                                <div class="col-4 col-md-3">
+                                    <div class="image-option" onclick="selectImage('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400')">
+                                        <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=200" class="img-fluid rounded" alt="Restoran 2">
+                                    </div>
+                                </div>
+                                <div class="col-4 col-md-3">
+                                    <div class="image-option" onclick="selectImage('https://images.unsplash.com/photo-1552566626-52f8b828add9?w=400')">
+                                        <img src="https://images.unsplash.com/photo-1552566626-52f8b828add9?w=200" class="img-fluid rounded" alt="Restoran 3">
+                                    </div>
+                                </div>
+                                <div class="col-4 col-md-3">
+                                    <div class="image-option" onclick="selectImage('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400')">
+                                        <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=200" class="img-fluid rounded" alt="Restoran 4">
+                                    </div>
+                                </div>
+                                <div class="col-4 col-md-3">
+                                    <div class="image-option" onclick="selectImage('https://images.unsplash.com/photo-1559339352-11d035aa65de?w=400')">
+                                        <img src="https://images.unsplash.com/photo-1559339352-11d035aa65de?w=200" class="img-fluid rounded" alt="Restoran 5">
+                                    </div>
+                                </div>
+                                <div class="col-4 col-md-3">
+                                    <div class="image-option" onclick="selectImage('https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?w=400')">
+                                        <img src="https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?w=200" class="img-fluid rounded" alt="Restoran 6">
+                                    </div>
+                                </div>
+                                <div class="col-4 col-md-3">
+                                    <div class="image-option" onclick="selectImage('https://images.unsplash.com/photo-1537047902294-62a40c20a6ae?w=400')">
+                                        <img src="https://images.unsplash.com/photo-1537047902294-62a40c20a6ae?w=200" class="img-fluid rounded" alt="Restoran 7">
+                                    </div>
+                                </div>
+                                <div class="col-4 col-md-3">
+                                    <div class="image-option" onclick="selectImage('https://images.unsplash.com/photo-1544148103-0773bf10d330?w=400')">
+                                        <img src="https://images.unsplash.com/photo-1544148103-0773bf10d330?w=200" class="img-fluid rounded" alt="Restoran 8">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Mevcut/Secilen Resim Onizleme -->
+                        <div class="mb-4 text-center" id="imagePreviewContainer">
+                            <label class="form-label fw-bold d-block">Secilen Resim Onizleme</label>
+                            <img id="imagePreview" src="@(Model.ResimUrl ?? "")" alt="Onizleme" class="img-fluid rounded shadow" style="max-height: 200px; display: @(string.IsNullOrEmpty(Model.ResimUrl) ? "none" : "inline-block");"
+                                 onerror="this.style.display='none'">
+                            <p id="noImageText" class="text-muted" style="display: @(string.IsNullOrEmpty(Model.ResimUrl) ? "block" : "none");">Henuz resim secilmedi</p>
+                        </div>
+
+                        <hr class="my-4">
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="@Url.Action("Index")" class="btn btn-secondary btn-lg">
+                                <i class="fas fa-arrow-left me-2"></i>Geri Don
+                            </a>
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-save me-2"></i>Degisiklikleri Kaydet
+                            </button>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script>
+        function selectImage(url) {
+            // تحديث قيمة الـ input
+            document.getElementById('resimUrlInput').value = url;
+            
+            // تحديث الـ preview
+            var preview = document.getElementById('imagePreview');
+            var noImageText = document.getElementById('noImageText');
+            
+            preview.src = url;
+            preview.style.display = 'inline-block';
+            noImageText.style.display = 'none';
+            
+            // إزالة الـ selected من كل الصور
+            document.querySelectorAll('.image-option').forEach(function(el) {
+                el.classList.remove('selected');
+            });
+            
+            // إضافة الـ selected للصورة المختارة
+            event.currentTarget.classList.add('selected');
+        }
+        
+        // تحديث الـ preview عند كتابة URL يدوياً
+        document.getElementById('resimUrlInput').addEventListener('input', function() {
+            var url = this.value;
+            var preview = document.getElementById('imagePreview');
+            var noImageText = document.getElementById('noImageText');
+            
+            if (url) {
+                preview.src = url;
+                preview.style.display = 'inline-block';
+                noImageText.style.display = 'none';
+            } else {
+                preview.style.display = 'none';
+                noImageText.style.display = 'block';
+            }
+            
+            // إزالة الـ selected من كل الصور
+            document.querySelectorAll('.image-option').forEach(function(el) {
+                el.classList.remove('selected');
+            });
+        });
+    </script>
+    <style>
+        .image-option {
+            cursor: pointer;
+            border: 3px solid transparent;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        .image-option:hover {
+            border-color: #0d6efd;
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3);
+        }
+        .image-option.selected {
+            border-color: #198754;
+            box-shadow: 0 4px 15px rgba(25, 135, 84, 0.4);
+        }
+        .image-option img {
+            height: 80px;
+            width: 100%;
+            object-fit: cover;
+        }
+    </style>
+}

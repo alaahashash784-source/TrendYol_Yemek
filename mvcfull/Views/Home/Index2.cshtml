@@ -1,0 +1,187 @@
+@model IEnumerable<mvc_full.Models.Restoran>
+
+@{
+    ViewBag.Title = "Ana Sayfa - TrendYol Yemek";
+}
+
+@section styles {
+    @Styles.Render("~/Content/css/home-page.css")
+}
+
+@Html.AntiForgeryToken()
+
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center min-vh-100">
+            <div class="col-lg-6">
+                <div class="hero-content">
+                    <h1 class="display-3 fw-bold text-white mb-4 animate__animated animate__fadeInLeft">
+                        TrendYol Yemek
+                        <span class="text-warning">Siparisleriniz Kapida!</span>
+                    </h1>
+                    <p class="lead text-light mb-5 animate__animated animate__fadeInLeft animate__delay-1s">
+                        En sevdiginiz restoranlardan en lezzetli yemekleri hizli ve guvenli sekilde kapiniza getiriyoruz.
+                    </p>
+                    <div class="hero-buttons animate__animated animate__fadeInUp animate__delay-2s">
+                        @Html.ActionLink("Restoranlari Kesfet", "Index", "Restaurant", null, new { @class = "btn btn-warning btn-lg me-3 px-4 py-3 fw-bold" })
+                        @Html.ActionLink("Yemekleri Gor", "Index", "Food", null, new { @class = "btn btn-outline-light btn-lg px-4 py-3 fw-bold" })
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center">
+                <div class="hero-image animate__animated animate__fadeInRight animate__delay-1s">
+                    <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=500&h=400&fit=crop" alt="Yemek" class="img-fluid floating-animation">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section py-5 bg-light">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-12">
+                <h2 class="display-5 fw-bold text-primary mb-3">Neden TrendYol Yemek?</h2>
+                <p class="lead text-muted">Size en iyi hizmeti sunmak icin buradayiz</p>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="feature-card text-center p-4 h-100">
+                    <div class="feature-icon mb-4">
+                        <i class="fas fa-shipping-fast fa-4x text-primary"></i>
+                    </div>
+                    <h4 class="fw-bold mb-3">Hizli Teslimat</h4>
+                    <p class="text-muted">Siparisleriniz 30 dakika icinde kapinizda</p>
+                    <div class="feature-stats">
+                        <span class="badge bg-primary fs-6">Ortalama 25 Dakika</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="feature-card text-center p-4 h-100">
+                    <div class="feature-icon mb-4">
+                        <i class="fas fa-credit-card fa-4x text-success"></i>
+                    </div>
+                    <h4 class="fw-bold mb-3">Guvenli Odeme</h4>
+                    <p class="text-muted">Kredi karti, nakit veya online odeme</p>
+                    <div class="feature-stats">
+                        <span class="badge bg-success fs-6">SSL Guvenli</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="feature-card text-center p-4 h-100">
+                    <div class="feature-icon mb-4">
+                        <i class="fas fa-headset fa-4x text-warning"></i>
+                    </div>
+                    <h4 class="fw-bold mb-3">7/24 Destek</h4>
+                    <p class="text-muted">Musteri hizmetleri her zaman yaninizdayiz</p>
+                    <div class="feature-stats">
+                        <span class="badge bg-warning fs-6">Canli Destek</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Restaurants Section -->
+@if (Model != null && Model.Any())
+{
+    <section class="restaurants-section py-5">
+        <div class="container">
+            <div class="row align-items-center mb-5">
+                <div class="col-md-6">
+                    <h2 class="display-5 fw-bold text-primary mb-3">Populer Restoranlar</h2>
+                    <p class="lead text-muted">En cok tercih edilen restoranlarimiz</p>
+                </div>
+                <div class="col-md-6">
+                    @Html.ActionLink("Tum Restoranlari Gor", "Index", "Restaurant", null, new { @class = "btn btn-primary btn-lg" })
+                </div>
+            </div>
+            
+            <div class="row">
+                @foreach (var restaurant in Model.Take(6))
+                {
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="restaurant-card card border-0 shadow-hover h-100">
+                            <div class="restaurant-image-container">
+                                <img src="@(string.IsNullOrEmpty(restaurant.ResimUrl) ? "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=200&fit=crop" : restaurant.ResimUrl)" 
+                                     class="card-img-top restaurant-image" alt="@restaurant.Ad">
+                                <div class="restaurant-overlay">
+                                    <div class="overlay-content">
+                                        @Html.ActionLink("Yemekleri Gor", "ByRestaurant", "Food", new { id = restaurant.RestoranId }, new { @class = "btn btn-light btn-sm" })
+                                    </div>
+                                </div>
+                                <div class="restaurant-badge">
+                                    <span class="badge bg-success">Acik</span>
+                                </div>
+                            </div>
+                            <div class="card-body p-4">
+                                <h5 class="card-title fw-bold mb-2">@restaurant.Ad</h5>
+                                <p class="card-text text-muted small mb-3">
+                                    @(string.IsNullOrEmpty(restaurant.Aciklama) ? "Lezzetli yemekler burada" : restaurant.Aciklama)
+                                </p>
+                                <div class="restaurant-info d-flex justify-content-between align-items-center">
+                                    <div class="rating">
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            <i class="fas fa-star text-warning"></i>
+                                        }
+                                        <span class="text-muted ms-1">(4.8)</span>
+                                    </div>
+                                    <div class="delivery-time">
+                                        <small class="text-primary fw-bold">
+                                            <i class="fas fa-clock me-1"></i>30-45 Dakika
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+}
+else
+{
+    <section class="empty-restaurants py-5 bg-light text-center">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-6">
+                    <div class="empty-state">
+                        <i class="fas fa-store fa-5x text-muted mb-4"></i>
+                        <h3 class="text-muted mb-3">Henuz restoran eklenmemis</h3>
+                        <p class="text-muted mb-4">Lutfen yonetici panelinden restoran ekleyiniz</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+}
+
+@section scripts {
+    <script>
+        $(document).ready(function() {
+            // Initialize cart count
+            updateCartCount();
+            
+            // Restaurant card hover effects
+            $('.restaurant-card').hover(
+                function() {
+                    $(this).addClass('shadow-lg').removeClass('shadow-hover');
+                },
+                function() {
+                    $(this).removeClass('shadow-lg').addClass('shadow-hover');
+                }
+            );
+        });
+    </script>
+}

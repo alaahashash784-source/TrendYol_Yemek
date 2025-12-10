@@ -1,0 +1,350 @@
+﻿@*
+    صفحة سلة التسوق - تعرض الأطعمة المضافة للسلة
+    Controller: OrderPageController.cs → Action: Index()
+    الربط: Url.Action("Checkout") ينتقل لصفحة الدفع
+*@
+@model IEnumerable<mvc_full.Models.CartItemViewModel>
+
+@{
+    ViewBag.Title = "Sepetim";
+}
+
+@functions {
+    string GetFoodImage(string foodName, string resimUrl)
+    {
+        // ÖNCELİKLE: Eğer kullanıcı kendi resim URL'sini girdiyse, onu kullan!
+        if (!string.IsNullOrEmpty(resimUrl) && resimUrl.StartsWith("http"))
+        {
+            return resimUrl;
+        }
+        
+        if (string.IsNullOrEmpty(foodName)) return "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=300";
+        
+        string searchText = foodName.ToLower();
+        
+        // Kebap
+        if (searchText.Contains("chicken shish") || searchText.Contains("tavuk sis") || searchText.Contains("shish"))
+            return "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=300";
+        if (searchText.Contains("mixed grill") || searchText.Contains("karisik"))
+            return "https://images.unsplash.com/photo-1544025162-d76694265947?w=300";
+        if (searchText.Contains("adana"))
+            return "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=300";
+        if (searchText.Contains("iskender"))
+            return "https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=300";
+        if (searchText.Contains("doner") || searchText.Contains("döner"))
+            return "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=300";
+        if (searchText.Contains("kebab") || searchText.Contains("kebap"))
+            return "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=300";
+        if (searchText.Contains("kofte") || searchText.Contains("köfte"))
+            return "https://images.unsplash.com/photo-1529042410759-befb1204b468?w=300";
+            
+        // Pizza
+        if (searchText.Contains("margherita"))
+            return "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=300";
+        if (searchText.Contains("pepperoni"))
+            return "https://images.unsplash.com/photo-1628840042765-356cda07504e?w=300";
+        if (searchText.Contains("vegetarian") || searchText.Contains("vejeteryan"))
+            return "https://images.unsplash.com/photo-1571407970349-bc81e7e96d47?w=300";
+        if (searchText.Contains("sucuk"))
+            return "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=300";
+        if (searchText.Contains("pizza"))
+            return "https://images.unsplash.com/photo-1593560708920-61dd98c46a4e?w=300";
+            
+        // Burger
+        if (searchText.Contains("cheese burger") || searchText.Contains("cheeseburger"))
+            return "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=300";
+        if (searchText.Contains("chicken burger") || searchText.Contains("tavuk burger"))
+            return "https://images.unsplash.com/photo-1553979459-d2229ba7433a?w=300";
+        if (searchText.Contains("burger"))
+            return "https://images.unsplash.com/photo-1550547660-d9450f859349?w=300";
+            
+        // Tatli
+        if (searchText.Contains("baklava"))
+            return "https://images.unsplash.com/photo-1598110750624-207050c4f28c?w=300";
+        if (searchText.Contains("kunefe") || searchText.Contains("künefe"))
+            return "https://images.pexels.com/photos/14705223/pexels-photo-14705223.jpeg?w=300";
+        if (searchText.Contains("tiramisu"))
+            return "https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=300";
+        if (searchText.Contains("cheesecake"))
+            return "https://images.unsplash.com/photo-1533134242443-d4fd215305ad?w=300";
+            
+        // Diger
+        if (searchText.Contains("salad") || searchText.Contains("salata"))
+            return "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=300";
+        if (searchText.Contains("soup") || searchText.Contains("corba"))
+            return "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=300";
+        if (searchText.Contains("sushi"))
+            return "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=300";
+        if (searchText.Contains("pasta") || searchText.Contains("makarna"))
+            return "https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=300";
+        if (searchText.Contains("tavuk") || searchText.Contains("chicken"))
+            return "https://images.unsplash.com/photo-1598103442097-8b74394b95c6?w=300";
+            
+        return "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=300";
+    }
+}
+
+@Html.AntiForgeryToken()
+
+<div class="cart-page bg-light py-5">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="cart-header text-center">
+                    <h1 class="display-4 fw-bold text-primary mb-3">
+                        <i class="fas fa-shopping-cart me-3"></i>Sepetim
+                    </h1>
+                    <p class="lead text-muted">Sepetinizdeki urunleri kontrol edin</p>
+                </div>
+            </div>
+        </div>
+
+        @if (Model.Any())
+        {
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="cart-items">
+                        @foreach (var item in Model)
+                        {
+                            <div class="cart-item card mb-3 shadow-sm border-0" data-food-id="@item.YemekId">
+                                <div class="card-body p-4">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-3">
+                                            <img src="@GetFoodImage(item.YemekAdi, item.ResimUrl)" 
+                                                 class="img-fluid rounded" alt="@item.YemekAdi"
+                                                 onerror="this.src='https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=300'">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <h5 class="fw-bold mb-2">@item.YemekAdi</h5>
+                                            <p class="text-muted mb-2"><i class="fas fa-store me-1"></i>@item.RestoranAdi</p>
+                                            <p class="text-success fw-bold mb-0">@item.Fiyat.ToString("F2") TL</p>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="quantity-controls d-flex align-items-center justify-content-center">
+                                                <button type="button" class="btn btn-primary decrease-qty" data-food-id="@item.YemekId">
+                                                    <i class="fas fa-minus"></i>
+                                                </button>
+                                                <input type="number" class="form-control text-center mx-2 qty-input" 
+                                                       value="@item.Miktar" min="1" max="100" style="width: 80px; font-size: 18px; font-weight: bold;" 
+                                                       data-food-id="@item.YemekId" data-price="@item.Fiyat">
+                                                <button type="button" class="btn btn-primary increase-qty" data-food-id="@item.YemekId">
+                                                    <i class="fas fa-plus"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2 text-center">
+                                            <div class="fw-bold text-primary mb-2 item-total" data-food-id="@item.YemekId">@item.ToplamFiyat.ToString("F2") TL</div>
+                                            <a href="@Url.Action("RemoveFromCart", new { yemekId = item.YemekId })" class="btn btn-outline-danger btn-sm">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    <div class="mt-4 d-flex justify-content-between">
+                        @Html.ActionLink("Alisverise Devam Et", "Index", "Food", null, new { @class = "btn btn-outline-primary btn-lg" })
+                        @Html.ActionLink("Sepeti Temizle", "ClearCartAction", null, new { @class = "btn btn-outline-danger btn-lg" })
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="card shadow border-0 sticky-top" style="top: 100px;">
+                        <div class="card-header bg-primary text-white py-3">
+                            <h5 class="mb-0"><i class="fas fa-receipt me-2"></i>Siparis Ozeti</h5>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between mb-3">
+                                <span>Urun Sayisi:</span>
+                                <span class="fw-bold" id="total-items">@Model.Sum(x => x.Miktar)</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-3">
+                                <span>Urunler Toplami:</span>
+                                <span class="fw-bold" id="subtotal">@Model.Sum(x => x.ToplamFiyat).ToString("F2") TL</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-3">
+                                <span>Teslimat Ucreti:</span>
+                                <span class="text-success fw-bold">Ucretsiz</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-3">
+                                <span>KDV (%8):</span>
+                                <span id="tax">@((Model.Sum(x => x.ToplamFiyat) * 0.08m).ToString("F2")) TL</span>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between mb-4">
+                                <span class="h5 fw-bold">Toplam Tutar:</span>
+                                <span class="h5 fw-bold text-success" id="grand-total">@((Model.Sum(x => x.ToplamFiyat) * 1.08m).ToString("F2")) TL</span>
+                            </div>
+                            <div class="mb-4">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" placeholder="Kupon kodu">
+                                    <button class="btn btn-outline-secondary" type="button"><i class="fas fa-tag"></i> Uygula</button>
+                                </div>
+                            </div>
+                            <div class="d-grid">
+                                @Html.ActionLink("Odeme Yap", "Checkout", null, new { @class = "btn btn-success btn-lg fw-bold" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <i class="fas fa-shopping-cart fa-5x text-muted mb-4"></i>
+                <h3 class="text-muted mb-3">Sepetiniz bos</h3>
+                <p class="text-muted mb-4">Hemen lezzetli yemekler ekleyin!</p>
+                @Html.ActionLink("Yemeklere Git", "Index", "Food", null, new { @class = "btn btn-primary btn-lg" })
+            </div>
+        }
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        $(document).ready(function() {
+            // Increase quantity
+            $('.increase-qty').click(function() {
+                var foodId = $(this).data('food-id');
+                var input = $('.qty-input[data-food-id="' + foodId + '"]');
+                var currentQty = parseInt(input.val()) || 1;
+                
+                if (currentQty < 100) {
+                    var newQty = currentQty + 1;
+                    input.val(newQty);
+                    updateQuantity(foodId, newQty);
+                }
+            });
+
+            // Decrease quantity
+            $('.decrease-qty').click(function() {
+                var foodId = $(this).data('food-id');
+                var input = $('.qty-input[data-food-id="' + foodId + '"]');
+                var currentQty = parseInt(input.val()) || 1;
+                
+                if (currentQty > 1) {
+                    var newQty = currentQty - 1;
+                    input.val(newQty);
+                    updateQuantity(foodId, newQty);
+                }
+            });
+
+            // Manual input change
+            $('.qty-input').change(function() {
+                var foodId = $(this).data('food-id');
+                var newQty = parseInt($(this).val()) || 1;
+                
+                if (newQty < 1) {
+                    newQty = 1;
+                    $(this).val(1);
+                }
+                if (newQty > 100) {
+                    newQty = 100;
+                    $(this).val(100);
+                }
+                
+                updateQuantity(foodId, newQty);
+            });
+
+            // Update quantity via AJAX
+            function updateQuantity(foodId, quantity) {
+                $.ajax({
+                    url: '@Url.Action("UpdateQuantity", "OrderPage")',
+                    type: 'POST',
+                    data: {
+                        yemekId: foodId,
+                        miktar: quantity,
+                        __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                    },
+                    success: function(result) {
+                        if (result && result.success) {
+                            // Update item total
+                            var itemTotalElement = $('.item-total[data-food-id="' + foodId + '"]');
+                            itemTotalElement.text(parseFloat(result.itemTotal).toFixed(2) + ' TL');
+                            
+                            // Update cart summary
+                            $('#total-items').text(result.cartCount);
+                            $('#subtotal').text(parseFloat(result.cartTotal).toFixed(2) + ' TL');
+                            
+                            var tax = parseFloat(result.cartTotal) * 0.08;
+                            $('#tax').text(tax.toFixed(2) + ' TL');
+                            
+                            var grandTotal = parseFloat(result.cartTotal) * 1.08;
+                            $('#grand-total').text(grandTotal.toFixed(2) + ' TL');
+                            
+                            // Update cart count in navbar
+                            $('#cart-count').text(result.cartCount);
+                            
+                            // Show success animation
+                            itemTotalElement.addClass('text-success');
+                            setTimeout(function() {
+                                itemTotalElement.removeClass('text-success').addClass('text-primary');
+                            }, 500);
+                        } else {
+                            console.log('Error:', result);
+                            if (result && result.message) {
+                                showNotification(result.message, 'error');
+                            }
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.log('AJAX Error:', error);
+                        showNotification('Bir hata olustu. Lutfen tekrar deneyin.', 'error');
+                    }
+                });
+            }
+            
+            function showNotification(message, type) {
+                var bgClass = type === 'error' ? 'bg-danger' : 'bg-success';
+                var toast = $('<div class="toast align-items-center text-white ' + bgClass + ' border-0 position-fixed" style="top: 100px; right: 20px; z-index: 1055;"><div class="d-flex"><div class="toast-body">' + message + '</div><button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button></div></div>');
+                $('body').append(toast);
+                var toastInstance = new bootstrap.Toast(toast[0]);
+                toastInstance.show();
+                setTimeout(function() { toast.remove(); }, 3000);
+            }
+        });
+    </script>
+}
+
+<style>
+    .quantity-controls .btn {
+        width: 45px;
+        height: 45px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        font-size: 18px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    .quantity-controls .btn:hover {
+        background-color: #667eea;
+        color: white;
+        border-color: #667eea;
+        transform: scale(1.1);
+    }
+    .qty-input {
+        border-radius: 12px;
+        font-weight: bold;
+        border: 2px solid #dee2e6;
+        height: 45px;
+    }
+    .qty-input:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+    .cart-item {
+        transition: all 0.3s ease;
+        border-radius: 15px;
+    }
+    .cart-item:hover {
+        transform: translateX(5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+    }
+    .item-total {
+        transition: color 0.3s ease;
+    }
+</style>

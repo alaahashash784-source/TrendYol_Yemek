@@ -1,0 +1,171 @@
+@model IEnumerable<mvc_full.Models.Musteri>
+
+@{
+    ViewBag.Title = "Musteriler";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .admin-header {
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        color: white;
+        padding: 30px 0;
+        margin-bottom: 30px;
+    }
+    .customer-card {
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+        transition: transform 0.3s;
+    }
+    .customer-card:hover {
+        transform: translateY(-3px);
+    }
+    .avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 18px;
+    }
+</style>
+
+<div class="admin-header">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1><i class="fas fa-users me-3"></i>Musteriler</h1>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index", "Admin")" class="text-white-50">Admin</a></li>
+                        <li class="breadcrumb-item active text-white">Musteriler</li>
+                    </ol>
+                </nav>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <a href="@Url.Action("ExportCustomersCsv", "Admin")" class="btn btn-success">
+                    <i class="fas fa-file-csv me-1"></i>CSV Indir
+                </a>
+                <span class="badge bg-light text-dark fs-5">@Model.Count() Musteri</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    @if (TempData["Message"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>@TempData["Message"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-white py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-list me-2"></i>Musteri Listesi</h5>
+                <input type="text" id="searchInput" class="form-control w-25" placeholder="Musteri ara...">
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0" id="customersTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Musteri</th>
+                            <th>E-posta</th>
+                            <th>Telefon</th>
+                            <th>Kayit Tarihi</th>
+                            <th>Admin</th>
+                            <th>Islemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var customer in Model)
+                        {
+                            string initials = "";
+                            if (!string.IsNullOrEmpty(customer.Ad)) { initials += customer.Ad.Substring(0, 1).ToUpper(); }
+                            if (!string.IsNullOrEmpty(customer.Soyad)) { initials += customer.Soyad.Substring(0, 1).ToUpper(); }
+                            if (string.IsNullOrEmpty(initials)) { initials = "?"; }
+                            
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar me-3">@initials</div>
+                                        <div>
+                                            <strong>@customer.Ad @customer.Soyad</strong>
+                                            <br>
+                                            <small class="text-muted">ID: @customer.MusteriId</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <i class="fas fa-envelope text-muted me-1"></i>
+                                    @customer.Email
+                                </td>
+                                <td>
+                                    <i class="fas fa-phone text-muted me-1"></i>
+                                    @(string.IsNullOrEmpty(customer.Telefon) ? "Belirtilmemis" : customer.Telefon)
+                                </td>
+                                <td>
+                                    <i class="fas fa-calendar text-muted me-1"></i>
+                                    @customer.KayitTarihi.ToString("dd.MM.yyyy")
+                                </td>
+                                <td>
+                                    @if (customer.IsAdmin)
+                                    {
+                                        <span class="badge bg-danger"><i class="fas fa-shield-alt me-1"></i>Admin</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Kullanici</span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="@Url.Action("CustomerDetails", "Admin", new { id = customer.MusteriId })" class="btn btn-outline-primary" title="Detay">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        @if (!customer.IsAdmin)
+                                        {
+                                            <a href="@Url.Action("DeleteCustomer", "Admin", new { id = customer.MusteriId })" 
+                                               class="btn btn-outline-danger" title="Sil"
+                                               onclick="return confirm('Bu musteriyi silmek istediginizden emin misiniz?');">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <a href="@Url.Action("Index", "Admin")" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Admin Paneline Don
+        </a>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        $(document).ready(function() {
+            $('#searchInput').on('keyup', function() {
+                var value = $(this).val().toLowerCase();
+                $('#customersTable tbody tr').filter(function() {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+                });
+            });
+        });
+    </script>
+}

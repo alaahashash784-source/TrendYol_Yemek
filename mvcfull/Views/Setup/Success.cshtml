@@ -1,0 +1,78 @@
+@{
+    ViewBag.Title = "Admin Setup";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-success text-white text-center py-4">
+                    <h3 class="mb-0">
+                        <i class="fas fa-check-circle me-2"></i>
+                        Admin Setup Complete
+                    </h3>
+                </div>
+                <div class="card-body p-4">
+                    @if (ViewBag.Message != null)
+                    {
+                        <div class="alert alert-success">
+                            <i class="fas fa-check me-2"></i>
+                            @ViewBag.Message
+                        </div>
+                    }
+                    
+                    @if (ViewBag.Error != null)
+                    {
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            @ViewBag.Error
+                        </div>
+                    }
+
+                    @if (ViewBag.IsLoggedIn != null && (bool)ViewBag.IsLoggedIn)
+                    {
+                        <div class="alert alert-info">
+                            <h5><i class="fas fa-user-check me-2"></i>Giris Yapildi!</h5>
+                            <hr>
+                            <p class="mb-0">
+                                <strong>Admin olarak giris yaptiniz.</strong><br>
+                                Artik admin paneline ve tum sayfalara erisebilirsiniz.
+                            </p>
+                        </div>
+
+                        <div class="bg-light p-3 rounded mb-4">
+                            <h6 class="text-muted mb-2">Admin Bilgileri:</h6>
+                            <p class="mb-1"><strong>Email:</strong> admin@trendyol.com</p>
+                            <p class="mb-0"><strong>Sifre:</strong> admin123</p>
+                        </div>
+                    }
+
+                    <h5 class="mb-3">Simdi yapabilecekleriniz:</h5>
+                    
+                    <div class="d-grid gap-2">
+                        <a href="@Url.Action("Index", "Admin")" class="btn btn-primary btn-lg">
+                            <i class="fas fa-tachometer-alt me-2"></i>
+                            Admin Paneli
+                        </a>
+                        
+                        <a href="@Url.Action("Create", "Restaurant")" class="btn btn-success">
+                            <i class="fas fa-store me-2"></i>
+                            Yeni Restoran Ekle
+                        </a>
+                        
+                        <a href="@Url.Action("Create", "Food")" class="btn btn-warning">
+                            <i class="fas fa-utensils me-2"></i>
+                            Yeni Yemek Ekle
+                        </a>
+                        
+                        <a href="@Url.Action("Index", "Home")" class="btn btn-outline-secondary">
+                            <i class="fas fa-home me-2"></i>
+                            Ana Sayfa
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

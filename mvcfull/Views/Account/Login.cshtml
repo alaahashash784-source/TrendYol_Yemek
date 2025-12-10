@@ -1,0 +1,272 @@
+@*
+    صفحة تسجيل الدخول - نموذج إدخال البريد وكلمة المرور
+    Controller: AccountController.cs → Action: Login()
+    الربط: Html.BeginForm يرسل POST إلى Account/Login
+*@
+@model mvc_full.Models.ViewModels.LoginViewModel
+
+@{
+    ViewBag.Title = "Giriş Yap";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="login-page min-vh-100 d-flex align-items-center">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-5 col-md-7">
+                <!-- Login Card -->
+                <div class="login-card card shadow-2xl border-0 overflow-hidden">
+                    <!-- Header -->
+                    <div class="card-header bg-gradient-primary text-white text-center py-4">
+                        <div class="login-icon mb-3">
+                            <i class="fas fa-user-circle fa-4x"></i>
+                        </div>
+                        <h3 class="mb-0 fw-bold">Hesabınıza Giriş Yapın</h3>
+                        <p class="mb-0 opacity-75">Hemen giriş yapın ve sipariş vermeye başlayın</p>
+                    </div>
+
+                    <!-- Body -->
+                    <div class="card-body p-5">
+                        @using (Html.BeginForm("Login", "Account", FormMethod.Post, new { @class = "login-form" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+
+                            <!-- Email Field -->
+                            <div class="form-floating mb-4">
+                                @Html.EditorFor(m => m.Email, new { htmlAttributes = new { @class = "form-control form-control-lg", @placeholder = "E-posta adresiniz", id = "floatingEmail" } })
+                                <label for="floatingEmail" class="text-muted">
+                                    <i class="fas fa-envelope me-2"></i>E-posta Adresiniz
+                                </label>
+                                @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger small" })
+                            </div>
+
+                            <!-- Password Field -->
+                            <div class="form-floating mb-4">
+                                @Html.PasswordFor(m => m.Sifre, new { @class = "form-control form-control-lg", @placeholder = "Şifreniz", id = "floatingPassword" })
+                                <label for="floatingPassword" class="text-muted">
+                                    <i class="fas fa-lock me-2"></i>Şifreniz
+                                </label>
+                                @Html.ValidationMessageFor(m => m.Sifre, "", new { @class = "text-danger small" })
+                            </div>
+
+                            <!-- Remember Me & Forgot Password -->
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <div class="form-check">
+                                    @Html.CheckBoxFor(m => m.RememberMe, new { @class = "form-check-input", id = "rememberMe" })
+                                    <label class="form-check-label text-muted" for="rememberMe">
+                                        Beni hatırla
+                                    </label>
+                                </div>
+                                @Html.ActionLink("Şifremi unuttum", "ForgotPassword", null, new { @class = "text-decoration-none text-primary" })
+                            </div>
+
+                            <!-- Login Button -->
+                            <div class="d-grid mb-4">
+                                <button type="submit" class="btn btn-primary btn-lg py-3 fw-bold">
+                                    <i class="fas fa-sign-in-alt me-2"></i>Giriş Yap
+                                </button>
+                            </div>
+
+                            <!-- OR Divider -->
+                            <div class="divider-with-text mb-4">
+                                <hr class="flex-grow-1">
+                                <span class="px-3 text-muted bg-white">veya</span>
+                                <hr class="flex-grow-1">
+                            </div>
+
+                            <!-- Social Login Buttons -->
+                            <div class="row g-2 mb-4">
+                                <div class="col-6">
+                                    <button type="button" class="btn btn-outline-primary w-100 py-2">
+                                        <i class="fab fa-facebook-f me-2"></i>Facebook
+                                    </button>
+                                </div>
+                                <div class="col-6">
+                                    <button type="button" class="btn btn-outline-danger w-100 py-2">
+                                        <i class="fab fa-google me-2"></i>Google
+                                    </button>
+                                </div>
+                            </div>
+                        }
+
+                        <!-- Register Link -->
+                        <div class="text-center">
+                            <p class="text-muted mb-0">
+                                Hesabınız yok mu? 
+                                @Html.ActionLink("Hemen hesap oluşturun", "Register", new { }, new { @class = "text-primary text-decoration-none fw-bold" })
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="card-footer bg-light text-center py-3">
+                        <small class="text-muted">
+                            <i class="fas fa-shield-alt me-1"></i>
+                            Bilgileriniz SSL ile korunmaktadır
+                        </small>
+                    </div>
+                </div>
+
+                <!-- Features -->
+                <div class="features-section mt-5">
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <div class="feature-item">
+                                <i class="fas fa-shipping-fast text-primary fa-2x mb-2"></i>
+                                <small class="text-muted d-block">Hızlı Teslimat</small>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="feature-item">
+                                <i class="fas fa-credit-card text-success fa-2x mb-2"></i>
+                                <small class="text-muted d-block">Güvenli Ödeme</small>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="feature-item">
+                                <i class="fas fa-headset text-warning fa-2x mb-2"></i>
+                                <small class="text-muted d-block">Destek 24/7</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script>
+        $(document).ready(function() {
+            // Add focus effects to form fields
+            $('.form-floating .form-control').on('focus', function() {
+                $(this).parent().addClass('focused');
+            }).on('blur', function() {
+                if (!$(this).val()) {
+                    $(this).parent().removeClass('focused');
+                }
+            });
+
+            // Form validation enhancement
+            $('.login-form').on('submit', function(e) {
+                var email = $('#floatingEmail').val();
+                var password = $('#floatingPassword').val();
+                
+                if (!email || !password) {
+                    e.preventDefault();
+                    showAlert('Lütfen tüm alanları doldurun', 'warning');
+                }
+            });
+
+            function showAlert(message, type) {
+                var alert = $('<div class="alert alert-' + type + ' alert-dismissible fade show" role="alert">' +
+                    '<i class="fas fa-exclamation-triangle me-2"></i>' + message + 
+                    '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+                    '</div>');
+                
+                $('.card-body').prepend(alert);
+                
+                setTimeout(function() {
+                    alert.alert('close');
+                }, 5000);
+            }
+
+            // Animate login card on load
+            $('.login-card').addClass('animate__animated animate__fadeInUp');
+
+            // Password visibility toggle
+            var passwordToggle = $('<button type="button" class="btn btn-outline-secondary position-absolute" style="right: 10px; top: 50%; transform: translateY(-50%); z-index: 5;"><i class="fas fa-eye"></i></button>');
+            $('.form-floating').has('#floatingPassword').css('position', 'relative').append(passwordToggle);
+            
+            passwordToggle.click(function() {
+                var passwordField = $('#floatingPassword');
+                var icon = $(this).find('i');
+                
+                if (passwordField.attr('type') === 'password') {
+                    passwordField.attr('type', 'text');
+                    icon.removeClass('fa-eye').addClass('fa-eye-slash');
+                } else {
+                    passwordField.attr('type', 'password');
+                    icon.removeClass('fa-eye-slash').addClass('fa-eye');
+                }
+            });
+        });
+    </script>
+}
+
+<style>
+    .login-page {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .login-page::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="%23ffffff" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="%23ffffff" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+        opacity: 0.3;
+    }
+
+    .login-card {
+        border-radius: 20px;
+        backdrop-filter: blur(10px);
+        background: rgba(255, 255, 255, 0.95);
+    }
+
+    .shadow-2xl {
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .form-floating.focused label {
+        color: #667eea !important;
+    }
+
+    .form-floating .form-control:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+
+    .divider-with-text {
+        display: flex;
+        align-items: center;
+    }
+
+    .btn {
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+    }
+
+    .feature-item {
+        transition: transform 0.3s ease;
+    }
+
+    .feature-item:hover {
+        transform: translateY(-5px);
+    }
+
+    .login-icon {
+        animation: pulse 2s infinite;
+    }
+
+    @@keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        transform: scale(1);
+    }
+
+    @@media (max-width: 768px) {
