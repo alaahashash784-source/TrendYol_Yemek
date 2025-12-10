@@ -142,11 +142,8 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\OrderPageController.cs" />
     <Compile Include="Controllers\RestaurantController.cs" />
-    <Compile Include="Controllers\RestoranController.cs" />
     <Compile Include="Controllers\SearchController.cs" />
     <Compile Include="Controllers\SeedDataController.cs" />
-    <Compile Include="Controllers\TestController.cs" />
-    <Compile Include="Controllers\YemekController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -159,7 +156,7 @@
       <DependentUpon>202510100052286_%27init%27.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
-    <Compile Include="Models\ABCDbContext.cs" />
+    <Compile Include="Controllers\ABCDbContext.cs" />
     <Compile Include="Models\CartItemViewModel.cs" />
     <Compile Include="Models\Fatura.cs" />
     <Compile Include="Models\Musteri.cs" />

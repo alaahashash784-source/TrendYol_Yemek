@@ -35,7 +35,7 @@ namespace mvc_full.Controllers
         
         // صفحة إتمام الطلب (Checkout) - إدخال بيانات التوصيل
         // الرابط: /OrderPage/Checkout
-        
+        public ActionResult Checkout()
         {
             var cartItems = GetCartItems();
             
