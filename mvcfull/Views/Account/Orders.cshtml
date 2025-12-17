@@ -7,6 +7,10 @@
 
 @{
     ViewBag.Title = "Siparislerim";
+    
+    // Sabit süreler
+    int onaylamaSuresi = 10;  // 10 dakika
+    int teslimatSuresi = 35;  // 35 dakika
 }
 
 <div class="container py-5">
@@ -35,6 +39,20 @@
                         int statusLevel = 1; // Default: Onaylandi
                         string statusBadgeClass = "bg-warning";
                         string statusIcon = "fa-clock";
+                        
+                        // Süre hesaplamaları
+                        int hazirlanmaSuresi = order.TahminiHazirlanmaSuresi > 0 ? order.TahminiHazirlanmaSuresi : 20;
+                        var siparisSaati = order.OrderDate;
+                        var onayBitisSaati = siparisSaati.AddMinutes(onaylamaSuresi);
+                        var hazirBitisSaati = onayBitisSaati.AddMinutes(hazirlanmaSuresi);
+                        var teslimSaati = hazirBitisSaati.AddMinutes(teslimatSuresi);
+                        
+                        // Kalan süreleri hesapla
+                        var now = DateTime.Now;
+                        int kalanHazirlanma = (int)(hazirBitisSaati - now).TotalMinutes;
+                        int kalanTeslim = (int)(teslimSaati - now).TotalMinutes;
+                        if (kalanHazirlanma < 0) { kalanHazirlanma = 0; }
+                        if (kalanTeslim < 0) { kalanTeslim = 0; }
                         
                         if (currentStatus == "Onaylandi") { statusLevel = 1; statusBadgeClass = "bg-info"; statusIcon = "fa-check-circle"; }
                         else if (currentStatus == "Hazirlaniyor") { statusLevel = 2; statusBadgeClass = "bg-warning"; statusIcon = "fa-fire"; }
@@ -170,19 +188,30 @@
                                             </div>
                                         </div>
                                         
-                                        @if (statusLevel == 2)
+                                        @if (statusLevel == 1)
+                                        {
+                                            <div class="status-message mt-3 text-center">
+                                                <div class="alert alert-info py-2 mb-0">
+                                                    <i class="fas fa-check-circle me-2"></i>Siparisiz onaylandi! Hazirlanmaya baslanacak.
+                                                    <br><small class="text-muted">Tahmini teslim: @teslimSaati.ToString("HH:mm") | Kalan: @kalanTeslim dakika</small>
+                                                </div>
+                                            </div>
+                                        }
+                                        else if (statusLevel == 2)
                                         {
                                             <div class="status-message mt-3 text-center">
                                                 <div class="alert alert-warning py-2 mb-0">
-                                                    <i class="fas fa-fire me-2"></i>Siparisiz hazirlaniyor... Tahmini sure: 15-20 dakika
+                                                    <i class="fas fa-fire me-2"></i>Siparisiz hazirlaniyor...
+                                                    <br><small>Hazirlanma kalan: <strong>@kalanHazirlanma dakika</strong> | Teslim: @teslimSaati.ToString("HH:mm")</small>
                                                 </div>
                                             </div>
                                         }
                                         else if (statusLevel == 3)
                                         {
                                             <div class="status-message mt-3 text-center">
-                                                <div class="alert alert-info py-2 mb-0">
-                                                    <i class="fas fa-motorcycle me-2"></i>Kuryemiz yola cikti! Tahmini varis: 10-15 dakika
+                                                <div class="alert alert-primary py-2 mb-0">
+                                                    <i class="fas fa-motorcycle me-2"></i>Kuryemiz yola cikti!
+                                                    <br><small>Tahmini varis: <strong>@kalanTeslim dakika</strong> icinde (@teslimSaati.ToString("HH:mm"))</small>
                                                 </div>
                                             </div>
                                         }

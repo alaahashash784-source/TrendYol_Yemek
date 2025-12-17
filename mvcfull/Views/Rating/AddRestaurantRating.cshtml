@@ -1,0 +1,133 @@
+@model mvc_full.Models.Rating
+@{
+    ViewBag.Title = "Restoran Degerlendir";
+    var restoran = ViewBag.Restoran as mvc_full.Models.Restoran;
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Ana Sayfa</a></li>
+                    <li class="breadcrumb-item"><a href="@Url.Action("Index", "Restaurant")">Restoranlar</a></li>
+                    <li class="breadcrumb-item"><a href="@Url.Action("Details", "Restaurant", new { id = restoran.RestoranId })">@restoran.Isim</a></li>
+                    <li class="breadcrumb-item active">Degerlendir</li>
+                </ol>
+            </nav>
+            
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>@TempData["Error"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+            
+            <!-- Rating Card -->
+            <div class="card border-0 shadow-lg">
+                <div class="card-header bg-gradient bg-success text-white py-3">
+                    <h4 class="mb-0">
+                        <i class="fas fa-store me-2"></i>Restorani Degerlendir
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Restaurant Preview -->
+                    <div class="d-flex align-items-center mb-4 p-3 bg-light rounded">
+                        <div class="rounded me-3 bg-success d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                            <i class="fas fa-store text-white fa-2x"></i>
+                        </div>
+                        <div>
+                            <h5 class="mb-1">@restoran.Isim</h5>
+                            <span class="text-muted">@restoran.Adres</span>
+                        </div>
+                    </div>
+                    
+                    @using (Html.BeginForm("AddRestaurantRating", "Rating", FormMethod.Post, new { @class = "needs-validation" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.HiddenFor(m => m.RestoranId)
+                        @Html.HiddenFor(m => m.OrderId)
+                        
+                        <!-- Star Rating -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Puaniniz <span class="text-danger">*</span></label>
+                            <div class="star-rating-input text-center py-3">
+                                <div class="stars d-inline-flex flex-row-reverse">
+                                    @for (int i = 5; i >= 1; i--)
+                                    {
+                                        <input type="radio" name="Puan" value="@i" id="star@(i)" class="d-none" @(Model.Puan == i ? "checked" : "")>
+                                        <label for="star@(i)" class="star-label fs-1 px-1" style="cursor: pointer;">
+                                            <i class="far fa-star star-icon"></i>
+                                        </label>
+                                    }
+                                </div>
+                                <div class="rating-text mt-2 text-muted" id="ratingText">Puanlamak icin yildizlara tiklayin</div>
+                            </div>
+                            @Html.ValidationMessageFor(m => m.Puan, "", new { @class = "text-danger" })
+                        </div>
+                        
+                        <!-- Comment -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Yorumunuz (istege bagli)</label>
+                            @Html.TextAreaFor(m => m.Yorum, new { @class = "form-control", @rows = 4, @placeholder = "Bu restoran hakkinda dusuncelerinizi yazin...", @maxlength = 1000 })
+                            <div class="form-text">Maksimum 1000 karakter</div>
+                        </div>
+                        
+                        <!-- Submit Buttons -->
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="fas fa-paper-plane me-2"></i>Degerlendirmeyi Gonder
+                            </button>
+                            <a href="@Url.Action("Details", "Restaurant", new { id = restoran.RestoranId })" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Vazgec
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .star-rating-input .star-label .star-icon {
+        color: #ddd;
+        transition: all 0.2s ease;
+    }
+    
+    .star-rating-input .star-label:hover .star-icon,
+    .star-rating-input .star-label:hover ~ .star-label .star-icon {
+        color: #ffc107;
+    }
+    
+    .star-rating-input input:checked ~ .star-label .star-icon {
+        color: #ffc107;
+        font-weight: 900;
+    }
+    
+    .star-rating-input input:checked ~ .star-label .star-icon::before {
+        content: "\f005";
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ratingTexts = {
+            1: 'Cok Kotu 😞',
+            2: 'Kotu 😕',
+            3: 'Orta 😐',
+            4: 'Iyi 😊',
+            5: 'Mukemmel! 🤩'
+        };
+        
+        document.querySelectorAll('input[name="Puan"]').forEach(function(radio) {
+            radio.addEventListener('change', function() {
+                document.getElementById('ratingText').textContent = ratingTexts[this.value];
+            });
+        });
+    });
+</script>

@@ -37,6 +37,7 @@ namespace mvc_full.Models
         public DbSet<Sepet> Sepetler { get; set; }              // جدول السلة
         public DbSet<TrendYol_Platformu> TrendYolPlatformlar { get; set; } // جدول المنصة
         public DbSet<Yemek> Yemekler { get; set; }              // جدول الأطعمة
+        public DbSet<Rating> Ratings { get; set; }              // جدول التقييمات
 
         
         protected override void OnModelCreating(DbModelBuilder modelBuilder)

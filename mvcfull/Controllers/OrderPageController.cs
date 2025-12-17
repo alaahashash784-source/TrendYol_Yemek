@@ -138,7 +138,9 @@ namespace mvc_full.Controllers
                     DeliveryAddress = model.Adres ?? "Belirtilmedi",
                     PaymentMethod = model.OdemeYontemi ?? "Kapida Odeme",
                     OrderDate = DateTime.Now,
-                    OrderStatus = "Onaylandi"  // الحالة الأولية
+                    OrderStatus = "Onaylandi",  // الحالة الأولية
+                    // حساب وقت التجهيز بناءً على أقصى وقت للوجبات في السلة
+                    TahminiHazirlanmaSuresi = CalculatePreparationTime(cartItems)
                 };
 
                 // حفظ في قاعدة البيانات
@@ -419,6 +421,24 @@ namespace mvc_full.Controllers
         private void ClearCart()
         {
             Session["CartItems"] = null;
+        }
+        
+        // حساب وقت التجهيز بناءً على الوجبات في السلة
+        private int CalculatePreparationTime(List<CartItemViewModel> cartItems)
+        {
+            if (cartItems == null || !cartItems.Any())
+                return 30; // افتراضي 30 دقيقة للتحضير
+            
+            // جلب أوقات التحضير من قاعدة البيانات
+            var yemekIds = cartItems.Select(c => c.YemekId).ToList();
+            var yemekler = db.Yemekler.Where(y => yemekIds.Contains(y.YemekId)).ToList();
+            
+            if (!yemekler.Any())
+                return 30;
+            
+            // أقصى وقت تحضير (فقط وقت التحضير - التوصيل يُحسب منفصلاً)
+            int maxPrepTime = yemekler.Max(y => y.HazirlanmaSuresi > 0 ? y.HazirlanmaSuresi : 15);
+            return maxPrepTime; // وقت التحضير فقط
         }
 
         #endregion

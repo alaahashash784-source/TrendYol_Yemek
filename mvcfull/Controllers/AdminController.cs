@@ -186,6 +186,94 @@ namespace mvc_full.Controllers
             base.Dispose(disposing);
         }
 
+        // GET: Admin/RestaurantAdmins - إدارة مديري المطاعم
+        [AdminAuthorizationFilter]
+        public ActionResult RestaurantAdmins()
+        {
+            var restoranAdmins = db.Musteriler
+                .Where(m => m.IsRestoranAdmin)
+                .ToList();
+            
+            ViewBag.Restoranlar = new SelectList(db.Restoranlar.ToList(), "RestoranId", "Ad");
+            return View(restoranAdmins);
+        }
+        
+        // GET: Admin/CreateRestaurantAdmin
+        [AdminAuthorizationFilter]
+        public ActionResult CreateRestaurantAdmin()
+        {
+            ViewBag.Restoranlar = new SelectList(db.Restoranlar.ToList(), "RestoranId", "Ad");
+            return View();
+        }
+        
+        // POST: Admin/CreateRestaurantAdmin
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [AdminAuthorizationFilter]
+        public ActionResult CreateRestaurantAdmin(Musteri model, int restoranId)
+        {
+            if (ModelState.IsValid)
+            {
+                // التحقق من عدم وجود إيميل مكرر
+                if (db.Musteriler.Any(m => m.Email == model.Email))
+                {
+                    ModelState.AddModelError("Email", "Bu email adresi zaten kullanılıyor");
+                    ViewBag.Restoranlar = new SelectList(db.Restoranlar.ToList(), "RestoranId", "Ad", restoranId);
+                    return View(model);
+                }
+                
+                // تشفير كلمة المرور
+                model.Sifre = Helpers.SecurityHelper.HashPassword(model.Sifre);
+                model.IsRestoranAdmin = true;
+                model.RestoranId = restoranId;
+                model.IsAdmin = false;
+                model.KayitTarihi = DateTime.Now;
+                
+                db.Musteriler.Add(model);
+                db.SaveChanges();
+                
+                TempData["Message"] = "Restoran yöneticisi başarıyla oluşturuldu";
+                return RedirectToAction("RestaurantAdmins");
+            }
+            
+            ViewBag.Restoranlar = new SelectList(db.Restoranlar.ToList(), "RestoranId", "Ad", restoranId);
+            return View(model);
+        }
+        
+        // POST: Admin/SetRestaurantAdmin
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [AdminAuthorizationFilter]
+        public ActionResult SetRestaurantAdmin(int musteriId, int restoranId)
+        {
+            var musteri = db.Musteriler.Find(musteriId);
+            if (musteri != null)
+            {
+                musteri.IsRestoranAdmin = true;
+                musteri.RestoranId = restoranId;
+                db.SaveChanges();
+                TempData["Message"] = $"{musteri.TamAd} artık restoran yöneticisi";
+            }
+            return RedirectToAction("RestaurantAdmins");
+        }
+        
+        // POST: Admin/RemoveRestaurantAdmin
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [AdminAuthorizationFilter]
+        public ActionResult RemoveRestaurantAdmin(int musteriId)
+        {
+            var musteri = db.Musteriler.Find(musteriId);
+            if (musteri != null)
+            {
+                musteri.IsRestoranAdmin = false;
+                musteri.RestoranId = null;
+                db.SaveChanges();
+                TempData["Message"] = $"{musteri.TamAd} artık restoran yöneticisi değil";
+            }
+            return RedirectToAction("RestaurantAdmins");
+        }
+
         // GET: Admin/ExportOrdersCsv - Export orders to CSV
         public ActionResult ExportOrdersCsv()
         {
@@ -271,6 +359,61 @@ namespace mvc_full.Controllers
                 return "\"" + field.Replace("\"", "\"\"") + "\"";
             }
             return field;
+        }
+        
+        // إنشاء مديري المطاعم - بدون تسجيل دخول مطلوب
+        [AllowAnonymous]
+        public ActionResult CreateRestaurantAdmins()
+        {
+            var results = new List<string>();
+            string defaultPassword = "admin123";
+            
+            var adminsToCreate = new[]
+            {
+                new { RestoranId = 1, Email = "kebap@admin.com", Ad = "Kebap" },
+                new { RestoranId = 2, Email = "pizza@admin.com", Ad = "Pizza" },
+                new { RestoranId = 3, Email = "burger@admin.com", Ad = "Burger" },
+                new { RestoranId = 4, Email = "deniz@admin.com", Ad = "Deniz" },
+                new { RestoranId = 5, Email = "asya@admin.com", Ad = "Asya" },
+                new { RestoranId = 6, Email = "tatli@admin.com", Ad = "Tatli" }
+            };
+            
+            foreach (var admin in adminsToCreate)
+            {
+                var existing = db.Musteriler.FirstOrDefault(m => m.Email == admin.Email);
+                
+                string hashedPassword = Helpers.SecurityHelper.HashPassword(defaultPassword);
+                
+                if (existing != null)
+                {
+                    existing.Sifre = hashedPassword;
+                    existing.IsRestoranAdmin = true;
+                    existing.RestoranId = admin.RestoranId;
+                    results.Add("UPDATED: " + admin.Email);
+                }
+                else
+                {
+                    var newAdmin = new Musteri
+                    {
+                        Ad = admin.Ad,
+                        Soyad = "Yönetici",
+                        Email = admin.Email,
+                        Sifre = hashedPassword,
+                        KayitTarihi = DateTime.Now,
+                        IsAdmin = false,
+                        IsRestoranAdmin = true,
+                        RestoranId = admin.RestoranId
+                    };
+                    db.Musteriler.Add(newAdmin);
+                    results.Add("CREATED: " + admin.Email + " / " + defaultPassword);
+                }
+            }
+            
+            db.SaveChanges();
+            
+            ViewBag.Results = results;
+            ViewBag.Password = defaultPassword;
+            return View();
         }
     }
 

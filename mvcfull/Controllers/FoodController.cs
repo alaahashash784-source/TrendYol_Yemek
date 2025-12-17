@@ -38,33 +38,71 @@ namespace mvc_full.Controllers
             return View(yemek);
         }
 
-        // GET: Food/Create - Admin only
-        [AdminAuthorizationFilter]
+        // GET: Food/Create - Admin or Restaurant Admin only
+        [AnyRestaurantAdminFilter]
         public ActionResult Create()
         {
-            ViewBag.RestoranId = new SelectList(db.Restoranlar, "RestoranId", "Ad");
+            // إذا كان مدير مطعم، نحدد المطعم تلقائياً
+            int? userRestoranId = Session["RestoranId"] as int?;
+            bool isAdmin = Session["IsAdmin"] != null && (bool)Session["IsAdmin"];
+            
+            if (isAdmin)
+            {
+                ViewBag.RestoranId = new SelectList(db.Restoranlar, "RestoranId", "Ad");
+            }
+            else if (userRestoranId.HasValue)
+            {
+                ViewBag.RestoranId = new SelectList(db.Restoranlar.Where(r => r.RestoranId == userRestoranId), "RestoranId", "Ad");
+                ViewBag.LockedRestoran = true;
+            }
+            
+            ViewBag.Kategoriler = GetKategoriler();
             return View();
         }
 
-        // POST: Food/Create - Admin only
+        // POST: Food/Create - Admin or Restaurant Admin only
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [AdminAuthorizationFilter]
-        public ActionResult Create([Bind(Include = "YemekId,Ad,Aciklama,Fiyat,ResimUrl,RestoranId")] Yemek yemek)
+        [AnyRestaurantAdminFilter]
+        public ActionResult Create([Bind(Include = "YemekId,Ad,Aciklama,Fiyat,ResimUrl,RestoranId,HazirlanmaSuresi,Kategori")] Yemek yemek)
         {
+            // التحقق من صلاحية مدير المطعم
+            int? userRestoranId = Session["RestoranId"] as int?;
+            bool isAdmin = Session["IsAdmin"] != null && (bool)Session["IsAdmin"];
+            
+            if (!isAdmin && userRestoranId.HasValue && yemek.RestoranId != userRestoranId.Value)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+            }
+            
             if (ModelState.IsValid)
             {
                 db.Yemekler.Add(yemek);
                 db.SaveChanges();
+                
+                // إذا كان مدير مطعم، يعود لصفحة مطعمه
+                if (!isAdmin && userRestoranId.HasValue)
+                {
+                    return RedirectToAction("ByRestaurant", new { id = userRestoranId.Value });
+                }
                 return RedirectToAction("Index");
             }
 
-            ViewBag.RestoranId = new SelectList(db.Restoranlar, "RestoranId", "Ad", yemek.RestoranId);
+            if (isAdmin)
+            {
+                ViewBag.RestoranId = new SelectList(db.Restoranlar, "RestoranId", "Ad", yemek.RestoranId);
+            }
+            else if (userRestoranId.HasValue)
+            {
+                ViewBag.RestoranId = new SelectList(db.Restoranlar.Where(r => r.RestoranId == userRestoranId), "RestoranId", "Ad");
+                ViewBag.LockedRestoran = true;
+            }
+            ViewBag.Kategoriler = GetKategoriler();
             return View(yemek);
         }
 
-        // GET: Food/Edit/5 - Admin only
-        [AdminAuthorizationFilter]
+        // GET: Food/Edit/5 - Admin or Restaurant Admin only
+        [RestaurantAdminFilter]
         public ActionResult Edit(int? id)
         {
             if (id == null)
@@ -79,28 +117,45 @@ namespace mvc_full.Controllers
             }
 
             ViewBag.RestoranId = new SelectList(db.Restoranlar, "RestoranId", "Ad", yemek.RestoranId);
+            ViewBag.Kategoriler = GetKategoriler();
             return View(yemek);
         }
 
-        // POST: Food/Edit/5 - Admin only
+        // POST: Food/Edit/5 - Admin or Restaurant Admin only
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [AdminAuthorizationFilter]
-        public ActionResult Edit([Bind(Include = "YemekId,Ad,Aciklama,Fiyat,ResimUrl,RestoranId")] Yemek yemek)
+        [RestaurantAdminFilter]
+        public ActionResult Edit([Bind(Include = "YemekId,Ad,Aciklama,Fiyat,ResimUrl,RestoranId,HazirlanmaSuresi,Kategori")] Yemek yemek)
         {
+            // التحقق من صلاحية مدير المطعم
+            int? userRestoranId = Session["RestoranId"] as int?;
+            bool isAdmin = Session["IsAdmin"] != null && (bool)Session["IsAdmin"];
+            
+            if (!isAdmin && userRestoranId.HasValue && yemek.RestoranId != userRestoranId.Value)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+            }
+            
             if (ModelState.IsValid)
             {
                 db.Entry(yemek).State = EntityState.Modified;
                 db.SaveChanges();
+                
+                // إذا كان مدير مطعم، يعود لصفحة مطعمه
+                if (!isAdmin && userRestoranId.HasValue)
+                {
+                    return RedirectToAction("ByRestaurant", new { id = userRestoranId.Value });
+                }
                 return RedirectToAction("Index");
             }
 
             ViewBag.RestoranId = new SelectList(db.Restoranlar, "RestoranId", "Ad", yemek.RestoranId);
+            ViewBag.Kategoriler = GetKategoriler();
             return View(yemek);
         }
 
-        // GET: Food/Delete/5 - Admin only
-        [AdminAuthorizationFilter]
+        // GET: Food/Delete/5 - Admin or Restaurant Admin only
+        [RestaurantAdminFilter]
         public ActionResult Delete(int? id)
         {
             if (id == null)
@@ -117,15 +172,32 @@ namespace mvc_full.Controllers
             return View(yemek);
         }
 
-        // POST: Food/Delete/5 - Admin only
+        // POST: Food/Delete/5 - Admin or Restaurant Admin only
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        [AdminAuthorizationFilter]
+        [RestaurantAdminFilter]
         public ActionResult DeleteConfirmed(int id)
         {
             var yemek = db.Yemekler.Find(id);
+            int restoranId = yemek.RestoranId;
+            
+            // التحقق من صلاحية مدير المطعم
+            int? userRestoranId = Session["RestoranId"] as int?;
+            bool isAdmin = Session["IsAdmin"] != null && (bool)Session["IsAdmin"];
+            
+            if (!isAdmin && userRestoranId.HasValue && restoranId != userRestoranId.Value)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+            }
+            
             db.Yemekler.Remove(yemek);
             db.SaveChanges();
+            
+            // إذا كان مدير مطعم، يعود لصفحة مطعمه
+            if (!isAdmin && userRestoranId.HasValue)
+            {
+                return RedirectToAction("ByRestaurant", new { id = userRestoranId.Value });
+            }
             return RedirectToAction("Index");
         }
 
@@ -163,8 +235,39 @@ namespace mvc_full.Controllers
             var yemekler = db.Yemekler.Where(y => y.RestoranId == id).ToList();
             ViewBag.RestaurantName = restaurant.Ad;
             ViewBag.RestaurantId = id;
+            
+            // التحقق من صلاحية الإدارة لهذا المطعم
+            bool isAdmin = Session["IsAdmin"] != null && (bool)Session["IsAdmin"];
+            bool isRestoranAdmin = Session["IsRestoranAdmin"] != null && (bool)Session["IsRestoranAdmin"];
+            int? userRestoranId = Session["RestoranId"] as int?;
+            
+            ViewBag.CanManage = isAdmin || (isRestoranAdmin && userRestoranId == id);
 
             return View(yemekler);
+        }
+        
+        // قائمة فئات الطعام
+        private List<SelectListItem> GetKategoriler()
+        {
+            return new List<SelectListItem>
+            {
+                new SelectListItem { Value = "", Text = "Kategori Seçin" },
+                new SelectListItem { Value = "Pizza", Text = "Pizza" },
+                new SelectListItem { Value = "Kebap", Text = "Kebap" },
+                new SelectListItem { Value = "Döner", Text = "Döner" },
+                new SelectListItem { Value = "Burger", Text = "Burger" },
+                new SelectListItem { Value = "Makarna", Text = "Makarna" },
+                new SelectListItem { Value = "Salata", Text = "Salata" },
+                new SelectListItem { Value = "Çorba", Text = "Çorba" },
+                new SelectListItem { Value = "Tatlı", Text = "Tatlı" },
+                new SelectListItem { Value = "İçecek", Text = "İçecek" },
+                new SelectListItem { Value = "Kahvaltı", Text = "Kahvaltı" },
+                new SelectListItem { Value = "Deniz Ürünleri", Text = "Deniz Ürünleri" },
+                new SelectListItem { Value = "Tavuk", Text = "Tavuk" },
+                new SelectListItem { Value = "Et Yemekleri", Text = "Et Yemekleri" },
+                new SelectListItem { Value = "Vegan", Text = "Vegan" },
+                new SelectListItem { Value = "Diğer", Text = "Diğer" }
+            };
         }
 
         protected override void Dispose(bool disposing)

@@ -17,11 +17,11 @@ namespace mvc_full.Models
         [Key]
         public int MusteriId { get; set; }    
 
-        // ═══════════════════════════════════════════════════════════════════
+       
         // بيانات المستخدم الأساسية
         // [Required] = حقل إجباري
         // [StringLength] = الحد الأقصى للأحرف
-        // ═══════════════════════════════════════════════════════════════════
+       
         [Required(ErrorMessage = "Ad gerekli")]           // الاسم إجباري
         [Display(Name = "Ad")]
         [StringLength(50)]
@@ -64,6 +64,18 @@ namespace mvc_full.Models
 
         [Display(Name = "Admin Mi?")]
         public bool IsAdmin { get; set; } = false;  // هل المستخدم أدمن؟
+
+        // ═══════════════════════════════════════════════════════════════════
+        // Restaurant Admin - مدير مطعم
+        // ═══════════════════════════════════════════════════════════════════
+        [Display(Name = "Restoran Yöneticisi Mi?")]
+        public bool IsRestoranAdmin { get; set; } = false;  // هل مدير مطعم؟
+
+        [Display(Name = "Yönetilen Restoran")]
+        public int? RestoranId { get; set; }  // رقم المطعم المدار (null للمستخدم العادي)
+
+        [ForeignKey("RestoranId")]
+        public virtual Restoran YonetilenRestoran { get; set; }  // المطعم المدار
 
         public virtual ICollection<Sepet> Sepetler { get; set; }      // سلات الزبون
         public virtual ICollection<OrderPage> Siparisler { get; set; } // طلبات الزبون

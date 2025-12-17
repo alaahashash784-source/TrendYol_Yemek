@@ -80,6 +80,12 @@
                             @Html.ActionLink("Admin Panel", "Index", "Admin", new { area = "" }, new { @class = "nav-link text-warning" })
                         </li>
                     }
+                    @if (Session["IsRestoranAdmin"] != null && (bool)Session["IsRestoranAdmin"] && Session["RestoranId"] != null)
+                    {
+                        <li class="nav-item">
+                            @Html.ActionLink("Restoran Paneli", "Dashboard", "RestaurantAdmin", new { area = "" }, new { @class = "nav-link text-success" })
+                        </li>
+                    }
                 </ul>
                 
                 <!-- User Menu -->
@@ -220,20 +226,12 @@
                         </button>
                     </form>
                     <div class="app-download mt-3">
-                        <p class="text-light-50 mb-2">Uygulamayi Simdi Indirin</p>
-                        <div class="d-flex flex-wrap gap-2">
-                            <a href="#" class="d-inline-block">
-                                <img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" 
-                                     alt="App Store" 
-                                     style="height: 40px; width: auto;"
-                                     onerror="this.style.display='none'">
-                            </a>
-                            <a href="#" class="d-inline-block">
-                                <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" 
-                                     alt="Google Play" 
-                                     style="height: 40px; width: auto;"
-                                     onerror="this.style.display='none'">
-                            </a>
+                        <p class="text-light-50 mb-2">Kabul edilen kartlar:</p>
+                        <div class="d-flex flex-wrap gap-2 align-items-center">
+                            <i class="fab fa-cc-visa fa-2x text-primary" title="Visa"></i>
+                            <i class="fab fa-cc-mastercard fa-2x text-warning" title="Mastercard"></i>
+                            <i class="fab fa-cc-amex fa-2x text-info" title="American Express"></i>
+                            <span class="badge bg-secondary px-3 py-2" style="font-size: 14px;">TROY</span>
                         </div>
                     </div>
                 </div>

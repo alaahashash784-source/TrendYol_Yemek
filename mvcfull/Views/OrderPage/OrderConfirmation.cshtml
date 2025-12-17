@@ -3,6 +3,46 @@
 @{
     ViewBag.Title = "Siparis Onaylandi";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    
+    // Süre hesaplamaları - 4 aşama
+    int onaylamaSuresi = 10;  // Aşama 1: Onaylama - 10 dakika sabit
+    int hazirlanmaSuresi = Model.TahminiHazirlanmaSuresi;  // Aşama 2: Hazırlama - veritabanından
+    int teslimatSuresi = 35;  // Aşama 3 ve 4: Teslimat - 35 dakika sabit
+    int toplamSure = onaylamaSuresi + hazirlanmaSuresi + teslimatSuresi;
+    
+    var siparisSaati = Model.OrderDate;
+    var onayBitisSaati = siparisSaati.AddMinutes(onaylamaSuresi);
+    var hazirBitisSaati = onayBitisSaati.AddMinutes(hazirlanmaSuresi);
+    var teslimSaati = hazirBitisSaati.AddMinutes(teslimatSuresi);
+    
+    // İlerleme yüzdesini hesapla
+    var gecenSure = (DateTime.Now - siparisSaati).TotalMinutes;
+    int ilerlemeYuzdesi = gecenSure > toplamSure ? 100 : (int)((gecenSure / toplamSure) * 100);
+    if (ilerlemeYuzdesi < 0) { ilerlemeYuzdesi = 0; }
+    
+    // Kalan süreleri hesapla
+    var kalanHazirlanmaSuresi = (int)(hazirBitisSaati - DateTime.Now).TotalMinutes;
+    if (kalanHazirlanmaSuresi < 0) { kalanHazirlanmaSuresi = 0; }
+    
+    var kalanTeslimSuresi = (int)(teslimSaati - DateTime.Now).TotalMinutes;
+    if (kalanTeslimSuresi < 0) { kalanTeslimSuresi = 0; }
+    
+    // Mevcut aşamayı belirleme
+    var now = DateTime.Now;
+    var currentStage = "onaylandi";
+    
+    if (now >= teslimSaati || Model.OrderStatus == "Teslim Edildi")
+    {
+        currentStage = "teslim";
+    }
+    else if (now >= hazirBitisSaati || Model.OrderStatus == "Yolda")
+    {
+        currentStage = "yolda";
+    }
+    else if (now >= onayBitisSaati || Model.OrderStatus == "Hazirlaniyor")
+    {
+        currentStage = "hazirlaniyor";
+    }
 }
 
 <div class="container py-5">
@@ -63,23 +103,96 @@
                     
                     <div class="bg-light rounded p-3 mb-4">
                         <div class="row text-center">
-                            <div class="col-4">
+                            <div class="col-3">
+                                <i class="fas fa-clipboard-check text-primary fa-2x mb-2"></i>
+                                <small class="text-muted d-block">Onaylama</small>
+                                <span class="fw-bold text-primary">@onaylamaSuresi dk</span>
+                            </div>
+                            <div class="col-3">
                                 <i class="fas fa-clock text-warning fa-2x mb-2"></i>
-                                <small class="text-muted d-block">Tahmini Teslimat</small>
-                                <span class="fw-bold">30-45 Dakika</span>
+                                <small class="text-muted d-block">Hazırlanma</small>
+                                <span class="fw-bold text-warning">@hazirlanmaSuresi dk</span>
                             </div>
-                            <div class="col-4">
-                                <i class="fas fa-check text-success fa-2x mb-2"></i>
-                                <small class="text-muted d-block">Odeme Durumu</small>
-                                <span class="fw-bold text-success">Onaylandi</span>
+                            <div class="col-3">
+                                <i class="fas fa-motorcycle text-info fa-2x mb-2"></i>
+                                <small class="text-muted d-block">Teslimat</small>
+                                <span class="fw-bold text-info">@teslimatSuresi dk</span>
                             </div>
-                            <div class="col-4">
-                                <i class="fas fa-motorcycle text-primary fa-2x mb-2"></i>
-                                <small class="text-muted d-block">Kurye</small>
-                                <span class="fw-bold">Atandi</span>
+                            <div class="col-3">
+                                <i class="fas fa-check-double text-success fa-2x mb-2"></i>
+                                <small class="text-muted d-block">Tahmini Teslim</small>
+                                <span class="fw-bold text-success">@teslimSaati.ToString("HH:mm")</span>
                             </div>
                         </div>
                     </div>
+                    
+                    <!-- Order Timeline - Dynamic -->
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-body p-4">
+                            <h5 class="card-title mb-4"><i class="fas fa-route me-2 text-primary"></i>Sipariş Takibi</h5>
+                            
+                            <div class="timeline-container position-relative">
+                                <!-- Timeline Line -->
+                                <div class="timeline-line position-absolute" style="top: 25px; left: 0; right: 0; height: 4px; background: #e9ecef; z-index: 0;">
+                                    <div class="timeline-progress" style="height: 100%; background: linear-gradient(90deg, #28a745, #17a2b8); width: @ilerlemeYuzdesi%;"></div>
+                                </div>
+                                
+                                <div class="row position-relative" style="z-index: 1;">
+                                    <!-- Stage 1: Onaylandı -->
+                                    <div class="col-3 text-center">
+                                        <div class="timeline-dot mx-auto mb-2 d-flex align-items-center justify-content-center rounded-circle @(currentStage != "" ? "bg-success text-white" : "bg-secondary text-white")" style="width: 50px; height: 50px;">
+                                            <i class="fas fa-check"></i>
+                                        </div>
+                                        <small class="d-block fw-bold text-success">Onaylandı</small>
+                                        <small class="text-muted">@siparisSaati.ToString("HH:mm")</small>
+                                    </div>
+                                    
+                                    <!-- Stage 2: Hazırlanıyor -->
+                                    <div class="col-3 text-center">
+                                        <div class="timeline-dot mx-auto mb-2 d-flex align-items-center justify-content-center rounded-circle @(currentStage == "hazirlaniyor" || currentStage == "yolda" || currentStage == "teslim" ? "bg-success text-white" : "bg-secondary text-white")" style="width: 50px; height: 50px;">
+                                            @if(currentStage == "hazirlaniyor")
+                                            {
+                                                <i class="fas fa-utensils fa-spin"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="fas fa-utensils"></i>
+                                            }
+                                        </div>
+                                        <small class="d-block fw-bold @(currentStage == "hazirlaniyor" ? "text-warning" : currentStage == "yolda" || currentStage == "teslim" ? "text-success" : "text-muted")">Hazırlanıyor</small>
+                                        <small class="text-muted">~@hazirlanmaSuresi dk</small>
+                                    </div>
+                                    
+                                    <!-- Stage 3: Yolda -->
+                                    <div class="col-3 text-center">
+                                        <div class="timeline-dot mx-auto mb-2 d-flex align-items-center justify-content-center rounded-circle @(currentStage == "yolda" || currentStage == "teslim" ? "bg-info text-white" : "bg-secondary text-white")" style="width: 50px; height: 50px;">
+                                            @if(currentStage == "yolda")
+                                            {
+                                                <i class="fas fa-motorcycle fa-beat"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="fas fa-motorcycle"></i>
+                                            }
+                                        </div>
+                                        <small class="d-block fw-bold @(currentStage == "yolda" ? "text-info" : currentStage == "teslim" ? "text-success" : "text-muted")">Yolda</small>
+                                        <small class="text-muted">~@teslimatSuresi dk</small>
+                                    </div>
+                                    
+                                    <!-- Stage 4: Teslim Edildi -->
+                                    <div class="col-3 text-center">
+                                        <div class="timeline-dot mx-auto mb-2 d-flex align-items-center justify-content-center rounded-circle @(currentStage == "teslim" ? "bg-success text-white" : "bg-secondary text-white")" style="width: 50px; height: 50px;">
+                                            <i class="fas fa-home"></i>
+                                        </div>
+                                        <small class="d-block fw-bold @(currentStage == "teslim" ? "text-success" : "text-muted")">Teslim Edildi</small>
+                                        <small class="text-muted">@teslimSaati.ToString("HH:mm")</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+
                     
                     <p class="text-muted small mb-4">
                         <i class="fas fa-envelope me-1"></i> Siparis durumunuz hakkinda e-posta ile bilgilendirileceksiniz.
@@ -116,4 +229,10 @@
         0%, 100% { transform: scale(1); }
         50% { transform: scale(1.1); }
     }
+    #countdown-timer {
+        font-family: 'Courier New', monospace;
+        letter-spacing: 3px;
+    }
 </style>
+
+

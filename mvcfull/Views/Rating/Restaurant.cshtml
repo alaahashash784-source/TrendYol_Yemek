@@ -1,0 +1,139 @@
+@model IEnumerable<mvc_full.Models.Rating>
+@{
+    ViewBag.Title = "Restoran Degerlendirmeleri";
+    var restoran = ViewBag.Restoran as mvc_full.Models.Restoran;
+    double avgRating = ViewBag.AverageRating;
+    int totalRatings = ViewBag.TotalRatings;
+}
+
+<div class="container py-5">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Ana Sayfa</a></li>
+            <li class="breadcrumb-item"><a href="@Url.Action("Index", "Restaurant")">Restoranlar</a></li>
+            <li class="breadcrumb-item"><a href="@Url.Action("Details", "Restaurant", new { id = restoran.RestoranId })">@restoran.Isim</a></li>
+            <li class="breadcrumb-item active">Degerlendirmeler</li>
+        </ol>
+    </nav>
+    
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>@TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    
+    <div class="row">
+        <!-- Left: Restaurant Info & Stats -->
+        <div class="col-lg-4 mb-4">
+            <div class="card border-0 shadow-sm sticky-top" style="top: 100px;">
+                <div class="card-body text-center p-4">
+                    <div class="rounded-circle bg-success mx-auto d-flex align-items-center justify-content-center mb-3" style="width: 120px; height: 120px;">
+                        <i class="fas fa-store text-white fa-3x"></i>
+                    </div>
+                    <h4>@restoran.Isim</h4>
+                    <p class="text-muted"><i class="fas fa-map-marker-alt me-1"></i>@restoran.Adres</p>
+                    
+                    <!-- Rating Summary -->
+                    <div class="py-3 border-top border-bottom my-3">
+                        <div class="display-4 fw-bold text-warning mb-2">
+                            @avgRating.ToString("F1")
+                        </div>
+                        <div class="stars mb-2">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                if (i <= Math.Floor(avgRating))
+                                {
+                                    <i class="fas fa-star text-warning"></i>
+                                }
+                                else if (i - avgRating < 1 && i - avgRating > 0)
+                                {
+                                    <i class="fas fa-star-half-alt text-warning"></i>
+                                }
+                                else
+                                {
+                                    <i class="far fa-star text-warning"></i>
+                                }
+                            }
+                        </div>
+                        <p class="text-muted mb-0">@totalRatings degerlendirme</p>
+                    </div>
+                    
+                    <a href="@Url.Action("AddRestaurantRating", "Rating", new { id = restoran.RestoranId })" class="btn btn-success btn-lg w-100">
+                        <i class="fas fa-star me-2"></i>Degerlendir
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right: Reviews List -->
+        <div class="col-lg-8">
+            <h4 class="mb-4">
+                <i class="fas fa-comments text-success me-2"></i>
+                Tum Degerlendirmeler (@totalRatings)
+            </h4>
+            
+            @if (Model.Any())
+            {
+                foreach (var rating in Model)
+                {
+                    <div class="card border-0 shadow-sm mb-3">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div class="d-flex align-items-center">
+                                    <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px;">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-0">@(rating.Musteri?.Ad ?? "Anonim")</h6>
+                                        <small class="text-muted">@rating.DegerlendirmeTarihi.ToString("dd MMMM yyyy")</small>
+                                    </div>
+                                </div>
+                                <div class="stars">
+                                    @for (int i = 1; i <= 5; i++)
+                                    {
+                                        <i class="@(i <= rating.Puan ? "fas" : "far") fa-star text-warning"></i>
+                                    }
+                                </div>
+                            </div>
+                            @if (!string.IsNullOrEmpty(rating.Yorum))
+                            {
+                                <p class="mb-0 mt-3">@rating.Yorum</p>
+                            }
+                            
+                            @{
+                                int? currentUserId = Session["MusteriId"] as int?;
+                                bool isAdmin = Session["IsAdmin"] != null && (bool)Session["IsAdmin"];
+                            }
+                            @if (currentUserId == rating.MusteriId || isAdmin)
+                            {
+                                <div class="mt-3 pt-2 border-top">
+                                    @using (Html.BeginForm("Delete", "Rating", new { id = rating.RatingId }, FormMethod.Post, new { @class = "d-inline" }))
+                                    {
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Bu degerlendirmeyi silmek istediginizden emin misiniz?')">
+                                            <i class="fas fa-trash me-1"></i>Sil
+                                        </button>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <i class="fas fa-comments fa-4x text-muted mb-3"></i>
+                    <h5 class="text-muted">Henuz degerlendirme yok</h5>
+                    <p class="text-muted">Bu restorani ilk degerlendiren siz olun!</p>
+                    <a href="@Url.Action("AddRestaurantRating", "Rating", new { id = restoran.RestoranId })" class="btn btn-success">
+                        <i class="fas fa-star me-2"></i>Ilk Degerlendirmeyi Yap
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</div>

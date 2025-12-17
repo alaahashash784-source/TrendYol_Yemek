@@ -16,10 +16,97 @@ namespace mvc_full.Controllers
         private ABCDbContext db = new ABCDbContext();
 
         // GET: Restaurant
-        public ActionResult Index()
+        public ActionResult Index(string kategori = null, decimal? minFiyat = null, decimal? maxFiyat = null, 
+                                   int? maxHazirlanmaSuresi = null, string siralama = null)
         {
-            var restaurants = db.Restoranlar.ToList();
-            return View(restaurants);
+            var restaurants = db.Restoranlar.AsQueryable();
+            
+            // البحث حسب نوع الطعام (فئة)
+            if (!string.IsNullOrEmpty(kategori))
+            {
+                var restoranIds = db.Yemekler
+                    .Where(y => y.Kategori != null && y.Kategori.ToLower().Contains(kategori.ToLower()))
+                    .Select(y => y.RestoranId)
+                    .Distinct()
+                    .ToList();
+                restaurants = restaurants.Where(r => restoranIds.Contains(r.RestoranId));
+                ViewBag.SearchKategori = kategori;
+            }
+            
+            // فلترة حسب السعر الأدنى
+            if (minFiyat.HasValue)
+            {
+                var restoranIds = db.Yemekler
+                    .Where(y => y.Fiyat >= minFiyat.Value)
+                    .Select(y => y.RestoranId)
+                    .Distinct()
+                    .ToList();
+                restaurants = restaurants.Where(r => restoranIds.Contains(r.RestoranId));
+                ViewBag.MinFiyat = minFiyat;
+            }
+            
+            // فلترة حسب السعر الأعلى
+            if (maxFiyat.HasValue)
+            {
+                var restoranIds = db.Yemekler
+                    .Where(y => y.Fiyat <= maxFiyat.Value)
+                    .Select(y => y.RestoranId)
+                    .Distinct()
+                    .ToList();
+                restaurants = restaurants.Where(r => restoranIds.Contains(r.RestoranId));
+                ViewBag.MaxFiyat = maxFiyat;
+            }
+            
+            // فلترة حسب سرعة التحضير
+            if (maxHazirlanmaSuresi.HasValue)
+            {
+                var restoranIds = db.Yemekler
+                    .Where(y => y.HazirlanmaSuresi <= maxHazirlanmaSuresi.Value)
+                    .Select(y => y.RestoranId)
+                    .Distinct()
+                    .ToList();
+                restaurants = restaurants.Where(r => restoranIds.Contains(r.RestoranId));
+                ViewBag.MaxHazirlanmaSuresi = maxHazirlanmaSuresi;
+            }
+            
+            // ترتيب النتائج
+            var restaurantList = restaurants.ToList();
+            
+            // حساب متوسط السعر ووقت التحضير لكل مطعم
+            var restaurantStats = new Dictionary<int, dynamic>();
+            foreach (var r in restaurantList)
+            {
+                var yemekler = db.Yemekler.Where(y => y.RestoranId == r.RestoranId).ToList();
+                restaurantStats[r.RestoranId] = new {
+                    AvgFiyat = yemekler.Any() ? yemekler.Average(y => y.Fiyat) : 0,
+                    AvgSure = yemekler.Any() ? yemekler.Average(y => y.HazirlanmaSuresi > 0 ? y.HazirlanmaSuresi : 15) : 0,
+                    YemekSayisi = yemekler.Count
+                };
+            }
+            ViewBag.RestaurantStats = restaurantStats;
+            
+            // ترتيب
+            switch (siralama)
+            {
+                case "fiyat_artan":
+                    restaurantList = restaurantList.OrderBy(r => restaurantStats[r.RestoranId].AvgFiyat).ToList();
+                    break;
+                case "fiyat_azalan":
+                    restaurantList = restaurantList.OrderByDescending(r => restaurantStats[r.RestoranId].AvgFiyat).ToList();
+                    break;
+                case "hizli":
+                    restaurantList = restaurantList.OrderBy(r => restaurantStats[r.RestoranId].AvgSure).ToList();
+                    break;
+                case "cok_yemek":
+                    restaurantList = restaurantList.OrderByDescending(r => restaurantStats[r.RestoranId].YemekSayisi).ToList();
+                    break;
+            }
+            ViewBag.Siralama = siralama;
+            
+            // قائمة الفئات للبحث
+            ViewBag.Kategoriler = GetKategoriler();
+            
+            return View(restaurantList);
         }
 
         // GET: Restaurant/Details/5
@@ -147,6 +234,30 @@ namespace mvc_full.Controllers
             
             TempData["Message"] = $"{restoran.Ad} ve tüm yemekleri başarıyla silindi.";
             return RedirectToAction("Index");
+        }
+        
+        // قائمة فئات الطعام - تعرض فقط الفئات الموجودة في قاعدة البيانات
+        private List<SelectListItem> GetKategoriler()
+        {
+            // جلب الفئات الموجودة فعلياً في قاعدة البيانات
+            var existingCategories = db.Yemekler
+                .Where(y => y.Kategori != null && y.Kategori != "")
+                .Select(y => y.Kategori)
+                .Distinct()
+                .OrderBy(k => k)
+                .ToList();
+            
+            var kategoriler = new List<SelectListItem>
+            {
+                new SelectListItem { Value = "", Text = "Tümü" }
+            };
+            
+            foreach (var kat in existingCategories)
+            {
+                kategoriler.Add(new SelectListItem { Value = kat, Text = kat });
+            }
+            
+            return kategoriler;
         }
 
         protected override void Dispose(bool disposing)

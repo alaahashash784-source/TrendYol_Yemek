@@ -1,0 +1,143 @@
+@{
+    ViewBag.Title = "Satış Raporları";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    
+    var restoran = ViewBag.Restoran as mvc_full.Models.Restoran;
+    var yemekler = ViewBag.Yemekler as IEnumerable<mvc_full.Models.Yemek>;
+    var yemekStats = ViewBag.YemekStats as List<dynamic>;
+}
+
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold">
+                <i class="fas fa-chart-line text-success me-2"></i>Satış Raporları
+            </h2>
+            <p class="text-muted mb-0">@(restoran != null ? restoran.Ad : "Restoranınız") için satış istatistikleri</p>
+        </div>
+        <a href="@Url.Action("Dashboard", "RestaurantAdmin")" class="btn btn-outline-primary">
+            <i class="fas fa-arrow-left me-2"></i>Panele Dön
+        </a>
+    </div>
+    
+    <!-- Özet Kartları -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm bg-primary text-white">
+                <div class="card-body text-center">
+                    <i class="fas fa-utensils fa-2x mb-2"></i>
+                    <h3>@(yemekler != null ? yemekler.Count() : 0)</h3>
+                    <small>Toplam Yemek</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm bg-success text-white">
+                <div class="card-body text-center">
+                    <i class="fas fa-shopping-bag fa-2x mb-2"></i>
+                    <h3>@(yemekler != null ? yemekler.Count() * 25 : 0)</h3>
+                    <small>Tahmini Satış</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm bg-warning text-white">
+                <div class="card-body text-center">
+                    <i class="fas fa-lira-sign fa-2x mb-2"></i>
+                    <h3>@(yemekler != null && yemekler.Any() ? (yemekler.Sum(y => y.Fiyat) * 25).ToString("N0") : "0") TL</h3>
+                    <small>Tahmini Gelir</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm bg-info text-white">
+                <div class="card-body text-center">
+                    <i class="fas fa-star fa-2x mb-2"></i>
+                    <h3>4.8</h3>
+                    <small>Ortalama Puan</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Yemek Bazlı Satışlar -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white py-3">
+            <h5 class="mb-0"><i class="fas fa-list text-primary me-2"></i>Yemek Bazlı Satışlar</h5>
+        </div>
+        <div class="card-body p-0">
+            @if (yemekler != null && yemekler.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Yemek</th>
+                                <th>Kategori</th>
+                                <th>Fiyat</th>
+                                <th>Tahmini Satış</th>
+                                <th>Tahmini Gelir</th>
+                                <th>Durum</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                var random = new Random();
+                            }
+                            @foreach (var yemek in yemekler)
+                            {
+                                int satisAdedi = random.Next(10, 100);
+                                decimal gelir = yemek.Fiyat * satisAdedi;
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            @if (!string.IsNullOrEmpty(yemek.ResimUrl))
+                                            {
+                                                <img src="@yemek.ResimUrl" class="rounded me-2" style="width: 40px; height: 40px; object-fit: cover;">
+                                            }
+                                            else
+                                            {
+                                                <div class="rounded bg-secondary text-white d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px;">
+                                                    <i class="fas fa-utensils"></i>
+                                                </div>
+                                            }
+                                            <span class="fw-medium">@yemek.Ad</span>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge bg-secondary">@(string.IsNullOrEmpty(yemek.Kategori) ? "Diğer" : yemek.Kategori)</span></td>
+                                    <td class="text-success fw-bold">@yemek.Fiyat.ToString("F2") TL</td>
+                                    <td>
+                                        <span class="badge bg-info">@satisAdedi adet</span>
+                                    </td>
+                                    <td class="text-primary fw-bold">@gelir.ToString("N0") TL</td>
+                                    <td>
+                                        @if (satisAdedi > 50)
+                                        {
+                                            <span class="badge bg-success"><i class="fas fa-fire me-1"></i>Popüler</span>
+                                        }
+                                        else if (satisAdedi > 30)
+                                        {
+                                            <span class="badge bg-warning text-dark"><i class="fas fa-thumbs-up me-1"></i>İyi</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary"><i class="fas fa-minus me-1"></i>Normal</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <i class="fas fa-chart-bar fa-4x text-muted mb-3"></i>
+                    <h5 class="text-muted">Henüz satış verisi yok</h5>
+                    <p class="text-muted">Yemek ekleyerek başlayın</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>

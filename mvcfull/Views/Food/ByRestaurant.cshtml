@@ -3,6 +3,7 @@
 @{
     ViewBag.Title = "Menu " + ViewBag.RestaurantName;
     bool isAdmin = Session["IsAdmin"] != null && (bool)Session["IsAdmin"];
+    bool canManage = ViewBag.CanManage ?? isAdmin;  // مدير المطعم أو الأدمن الرئيسي
 }
 
 @functions {
@@ -151,7 +152,7 @@
                 </div>
                 <div class="col-md-4">
                     <div class="restaurant-actions">
-                        @if (isAdmin)
+                        @if (canManage)
                         {
                             @Html.ActionLink("Yemek Ekle", "Create", "Food", new { restaurantId = ViewBag.RestaurantId }, new { @class = "btn btn-warning btn-lg me-2" })
                         }
@@ -236,15 +237,21 @@
                                             <i class="fas fa-star-half-alt text-warning"></i>
                                             <small class="text-muted ms-1">(4.5)</small>
                                         </div>
-                                        <small class="text-muted">
-                                            <i class="fas fa-clock me-1"></i>15-20 dk
+                                        <small class="text-success">
+                                            <i class="fas fa-clock me-1"></i>@(item.HazirlanmaSuresi > 0 ? item.HazirlanmaSuresi.ToString() : "15") dk
                                         </small>
                                     </div>
+                                    @if (!string.IsNullOrEmpty(item.Kategori))
+                                    {
+                                        <div class="mt-2">
+                                            <span class="badge bg-secondary">@item.Kategori</span>
+                                        </div>
+                                    }
                                 </div>
                             </div>
                         </a>
-                        <!-- Admin Actions -->
-                        @if (isAdmin)
+                        <!-- Admin or Restaurant Admin Actions -->
+                        @if (canManage)
                         {
                             <div class="text-center mt-2">
                                 @Html.ActionLink("Duzenle", "Edit", "Food", new { id = item.YemekId }, new { @class = "btn btn-outline-primary btn-sm me-1" })
@@ -264,7 +271,7 @@
                 </div>
                 <h3 class="text-muted mb-3">Bu restoranda henuz yemek yok</h3>
                 <p class="text-muted mb-4">Ilk yemegi ekleyerek menuyu olusturun</p>
-                @if (isAdmin)
+                @if (canManage)
                 {
                     @Html.ActionLink("Yemek Ekle", "Create", "Food", new { restaurantId = ViewBag.RestaurantId }, new { @class = "btn btn-success btn-lg" })
                 }

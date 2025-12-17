@@ -45,6 +45,70 @@ namespace mvc_full.Models
         [StringLength(50)]
         public string OrderStatus { get; set; } = "Onaylandi";
         
+        // وقت التجهيز المتوقع بالدقائق
+        [Column("TahminiHazirlanmaSuresi")]
+        public int TahminiHazirlanmaSuresi { get; set; } = 30;
+        
+        // الأوقات الثابتة بالدقائق
+        public const int OnaylamaSuresi = 10;    // مرحلة التأكيد: 10 دقائق
+        public const int TeslimatSuresi = 35;    // مرحلة التوصيل: 35 دقيقة
+        
+        // وقت انتهاء التأكيد (تاريخ ووقت)
+        [NotMapped]
+        public DateTime OnayBitisZamani
+        {
+            get { return OrderDate.AddMinutes(OnaylamaSuresi); }
+        }
+        
+        // وقت انتهاء التحضير (تاريخ ووقت)
+        [NotMapped]
+        public DateTime HazirlanmaZamani
+        {
+            get { return OrderDate.AddMinutes(OnaylamaSuresi + TahminiHazirlanmaSuresi); }
+        }
+        
+        // وقت التسليم النهائي (تأكيد + تحضير + توصيل)
+        [NotMapped]
+        public DateTime TahminiTeslimZamani
+        {
+            get { return OrderDate.AddMinutes(OnaylamaSuresi + TahminiHazirlanmaSuresi + TeslimatSuresi); }
+        }
+        
+        // الوقت المتبقي للتحضير بالدقائق
+        [NotMapped]
+        public int KalanHazirlanmaSuresi
+        {
+            get 
+            { 
+                var remaining = (HazirlanmaZamani - DateTime.Now).TotalMinutes;
+                return remaining > 0 ? (int)remaining : 0;
+            }
+        }
+        
+        // الوقت المتبقي للتسليم الكلي بالدقائق
+        [NotMapped]
+        public int KalanSure
+        {
+            get 
+            { 
+                var remaining = (TahminiTeslimZamani - DateTime.Now).TotalMinutes;
+                return remaining > 0 ? (int)remaining : 0;
+            }
+        }
+        
+        // نسبة التقدم (0-100)
+        [NotMapped]
+        public int IlerlemeYuzdesi
+        {
+            get
+            {
+                var toplamSure = OnaylamaSuresi + TahminiHazirlanmaSuresi + TeslimatSuresi;
+                var gecenSure = (DateTime.Now - OrderDate).TotalMinutes;
+                var yuzde = (gecenSure / toplamSure) * 100;
+                return yuzde > 100 ? 100 : (int)yuzde;
+            }
+        }
+        
         [NotMapped]
         public List<CartItemViewModel> CartItems { get; set; }
         

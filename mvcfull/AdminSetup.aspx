@@ -94,7 +94,7 @@
             Session["IsAdmin"] = true;
             
             Response.Write("<div class='alert alert-success'>");
-            Response.Write("<h5>🎉 Otomatik giris yapildi!</h5>");
+            Response.Write("<h5> Otomatik giris yapildi!</h5>");
             Response.Write("<p>Admin olarak giris yaptiniz. Artik tum sayfalara erisebilirsiniz.</p>");
             Response.Write("</div>");
             

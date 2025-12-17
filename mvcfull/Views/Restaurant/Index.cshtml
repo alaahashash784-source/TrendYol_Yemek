@@ -8,6 +8,13 @@
 @{
     ViewBag.Title = "Restoranlar";
     bool isAdmin = Session["IsAdmin"] != null && (bool)Session["IsAdmin"];
+    var kategoriler = ViewBag.Kategoriler as List<SelectListItem>;
+    string searchKategori = ViewBag.SearchKategori as string;
+    var restaurantStats = ViewBag.RestaurantStats as Dictionary<int, dynamic>;
+    decimal? minFiyat = ViewBag.MinFiyat as decimal?;
+    decimal? maxFiyat = ViewBag.MaxFiyat as decimal?;
+    int? maxHazirlanmaSuresi = ViewBag.MaxHazirlanmaSuresi as int?;
+    string siralama = ViewBag.Siralama as string;
 }
 
 <div class="container py-5">
@@ -20,6 +27,105 @@
         {
             @Html.ActionLink("Yeni Restoran Ekle", "Create", null, new { @class = "btn btn-warning btn-lg shadow" })
         }
+    </div>
+
+    <!-- فلترة وترتيب متقدم -->
+    <div class="row justify-content-center mb-5">
+        <div class="col-lg-10">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0"><i class="fas fa-filter text-primary me-2"></i>Filtrele ve Sırala</h5>
+                </div>
+                <div class="card-body">
+                    <form method="get" action="@Url.Action("Index", "Restaurant")">
+                        <div class="row g-3">
+                            <!-- فئة الطعام -->
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold"><i class="fas fa-utensils me-1"></i>Kategori</label>
+                                <select name="kategori" class="form-select">
+                                    <option value="">Tümü</option>
+                                    @if (kategoriler != null)
+                                    {
+                                        foreach (var kat in kategoriler.Where(k => k.Value != ""))
+                                        {
+                                            <option value="@kat.Value" @(kat.Value == searchKategori ? "selected" : "")>@kat.Text</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                            
+                            <!-- السعر -->
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold"><i class="fas fa-lira-sign me-1"></i>Min Fiyat (TL)</label>
+                                <input type="number" name="minFiyat" class="form-control" placeholder="0" value="@minFiyat" step="5">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold"><i class="fas fa-lira-sign me-1"></i>Max Fiyat (TL)</label>
+                                <input type="number" name="maxFiyat" class="form-control" placeholder="500" value="@maxFiyat" step="5">
+                            </div>
+                            
+                            <!-- سرعة التحضير -->
+                            <div class="col-md-2">
+                                <label class="form-label fw-bold"><i class="fas fa-clock me-1"></i>Max Süre (dk)</label>
+                                <select name="maxHazirlanmaSuresi" class="form-select">
+                                    <option value="">Hepsi</option>
+                                    <option value="15" @(maxHazirlanmaSuresi == 15 ? "selected" : "")>15 dk</option>
+                                    <option value="30" @(maxHazirlanmaSuresi == 30 ? "selected" : "")>30 dk</option>
+                                    <option value="45" @(maxHazirlanmaSuresi == 45 ? "selected" : "")>45 dk</option>
+                                    <option value="60" @(maxHazirlanmaSuresi == 60 ? "selected" : "")>60 dk</option>
+                                </select>
+                            </div>
+                            
+                        </div>
+                        
+                        <div class="row g-3 mt-2">
+                            <!-- الترتيب -->
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold"><i class="fas fa-sort me-1"></i>Sırala</label>
+                                <select name="siralama" class="form-select">
+                                    <option value="">Varsayılan</option>
+                                    <option value="fiyat_artan" @(siralama == "fiyat_artan" ? "selected" : "")>Fiyat: Düşükten Yükseğe</option>
+                                    <option value="fiyat_azalan" @(siralama == "fiyat_azalan" ? "selected" : "")>Fiyat: Yüksekten Düşüğe</option>
+                                    <option value="hizli" @(siralama == "hizli" ? "selected" : "")>En Hızlı Hazırlanan</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-8 d-flex align-items-end gap-2">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-search me-2"></i>Filtrele
+                                </button>
+                                <a href="@Url.Action("Index", "Restaurant")" class="btn btn-outline-secondary btn-lg">
+                                    <i class="fas fa-times me-2"></i>Temizle
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                    
+                    @if (!string.IsNullOrEmpty(searchKategori) || minFiyat.HasValue || maxFiyat.HasValue || maxHazirlanmaSuresi.HasValue)
+                    {
+                        <div class="mt-3 pt-3 border-top">
+                            <span class="text-muted me-2">Aktif Filtreler:</span>
+                            @if (!string.IsNullOrEmpty(searchKategori))
+                            {
+                                <span class="badge bg-info me-1"><i class="fas fa-tag me-1"></i>@searchKategori</span>
+                            }
+                            @if (minFiyat.HasValue)
+                            {
+                                <span class="badge bg-success me-1">Min: @minFiyat TL</span>
+                            }
+                            @if (maxFiyat.HasValue)
+                            {
+                                <span class="badge bg-warning text-dark me-1">Max: @maxFiyat TL</span>
+                            }
+                            @if (maxHazirlanmaSuresi.HasValue)
+                            {
+                                <span class="badge bg-primary me-1"><i class="fas fa-clock me-1"></i>@maxHazirlanmaSuresi dk</span>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
     </div>
 
     @if (Model.Any())

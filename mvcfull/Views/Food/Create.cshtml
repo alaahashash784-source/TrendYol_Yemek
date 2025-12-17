@@ -42,8 +42,51 @@
                             </div>
                             <div class="col-md-6 mb-4">
                                 <label class="form-label fw-bold">Restoran *</label>
-                                @Html.DropDownList("RestoranId", null, "-- Restoran Secin --", new { @class = "form-select form-select-lg" })
+                                @Html.DropDownList("RestoranId", null, "-- Restoran Secin --", new { @class = "form-select form-select-lg", disabled = ViewBag.LockedRestoran == true ? "disabled" : null })
+                                @if (ViewBag.LockedRestoran == true)
+                                {
+                                    @Html.HiddenFor(model => model.RestoranId)
+                                }
                                 @Html.ValidationMessageFor(model => model.RestoranId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-clock text-info me-1"></i>Hazırlanma Süresi (dakika) *
+                                </label>
+                                @Html.EditorFor(model => model.HazirlanmaSuresi, new { htmlAttributes = new { @class = "form-control form-control-lg", placeholder = "15", min = 1, max = 180 } })
+                                @Html.ValidationMessageFor(model => model.HazirlanmaSuresi, "", new { @class = "text-danger" })
+                                <small class="text-muted">Müşteriye yemeğin ne kadar sürede hazırlanacağını gösterir</small>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-tag text-success me-1"></i>Kategori
+                                </label>
+                                @Html.DropDownList("Kategori", ViewBag.Kategoriler as IEnumerable<SelectListItem>, new { @class = "form-select form-select-lg" })
+                                @Html.ValidationMessageFor(model => model.Kategori, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-boxes text-warning me-1"></i>Stok Miktarı *
+                                </label>
+                                @Html.EditorFor(model => model.Stok, new { htmlAttributes = new { @class = "form-control form-control-lg", placeholder = "100", min = 0, max = 10000 } })
+                                @Html.ValidationMessageFor(model => model.Stok, "", new { @class = "text-danger" })
+                                <small class="text-muted">Mevcut stok adedi. 0 olursa tükendi olarak görünür.</small>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-toggle-on text-primary me-1"></i>Stok Durumu
+                                </label>
+                                <div class="form-check form-switch mt-2">
+                                    @Html.CheckBoxFor(model => model.StokAktif, new { @class = "form-check-input", style = "width: 3em; height: 1.5em;" })
+                                    <label class="form-check-label ms-2">Satışa Açık</label>
+                                </div>
+                                <small class="text-muted">Kapalıysa müşteriler sipariş veremez.</small>
                             </div>
                         </div>
 

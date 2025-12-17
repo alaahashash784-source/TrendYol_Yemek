@@ -1,0 +1,206 @@
+@model mvc_full.Models.Restoran
+@{
+    ViewBag.Title = Model.Ad + " - Detaylar";
+    var foods = ViewBag.Foods as IEnumerable<mvc_full.Models.Yemek>;
+    bool isLoggedIn = Session["MusteriId"] != null;
+}
+
+<div class="container py-5">
+    <!-- Header -->
+    <div class="row mb-5">
+        <div class="col-lg-5 mb-4">
+            <div class="position-relative rounded-4 overflow-hidden shadow-lg" style="height: 350px;">
+                <img src="@(string.IsNullOrEmpty(Model.ResimUrl) ? "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800" : Model.ResimUrl)" 
+                     class="w-100 h-100" style="object-fit: cover;" alt="@Model.Ad">
+                <div class="position-absolute bottom-0 start-0 w-100 p-4" style="background: linear-gradient(transparent, rgba(0,0,0,0.8));">
+                    <span class="badge bg-success fs-6"><i class="fas fa-check-circle me-1"></i>Açık</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-7">
+            <h1 class="display-5 fw-bold mb-3">@Model.Ad</h1>
+            <p class="lead text-muted mb-4">@(string.IsNullOrEmpty(Model.Aciklama) ? "Lezzetli yemekler sunan restoranımız" : Model.Aciklama)</p>
+            
+            <!-- İletişim Bilgileri -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-phone-alt me-2"></i>İletişim Bilgileri</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="d-flex align-items-center">
+                                <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px;">
+                                    <i class="fas fa-phone"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block">Telefon</small>
+                                    @if (!string.IsNullOrEmpty(Model.Telefon))
+                                    {
+                                        <a href="tel:@Model.Telefon" class="fw-bold text-success text-decoration-none">@Model.Telefon</a>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Belirtilmemiş</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="d-flex align-items-center">
+                                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px;">
+                                    <i class="fas fa-envelope"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block">E-posta</small>
+                                    @if (!string.IsNullOrEmpty(Model.Email))
+                                    {
+                                        <a href="mailto:@Model.Email" class="fw-bold text-primary text-decoration-none">@Model.Email</a>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Belirtilmemiş</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="d-flex align-items-center">
+                                <div class="rounded-circle bg-warning text-white d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px;">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block">Adres</small>
+                                    @if (!string.IsNullOrEmpty(Model.Adres))
+                                    {
+                                        <span class="fw-bold">@Model.Adres</span>
+                                        <a href="https://www.google.com/maps/search/@Model.Adres" target="_blank" class="btn btn-sm btn-outline-primary ms-2">
+                                            <i class="fas fa-directions me-1"></i>Haritada Gör
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Belirtilmemiş</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- WhatsApp ve Mesaj Butonları -->
+                    <div class="mt-4 pt-3 border-top">
+                        <h6 class="mb-3"><i class="fas fa-comments me-2"></i>Hızlı İletişim</h6>
+                        <div class="d-flex flex-wrap gap-2">
+                            @if (!string.IsNullOrEmpty(Model.Telefon))
+                            {
+                                <a href="https://wa.me/@Model.Telefon.Replace(" ", "").Replace("-", "")" target="_blank" class="btn btn-success">
+                                    <i class="fab fa-whatsapp me-2"></i>WhatsApp ile Yaz
+                                </a>
+                                <a href="tel:@Model.Telefon" class="btn btn-primary">
+                                    <i class="fas fa-phone me-2"></i>Ara
+                                </a>
+                            }
+                            @if (!string.IsNullOrEmpty(Model.Email))
+                            {
+                                <a href="mailto:@Model.Email?subject=Sipariş Hakkında" class="btn btn-info text-white">
+                                    <i class="fas fa-envelope me-2"></i>E-posta Gönder
+                                </a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- İstatistikler -->
+            <div class="row text-center">
+                <div class="col-4">
+                    <div class="p-3 bg-light rounded">
+                        <i class="fas fa-utensils fa-2x text-primary mb-2"></i>
+                        <h4 class="mb-0">@(foods != null ? foods.Count() : 0)</h4>
+                        <small class="text-muted">Yemek</small>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="p-3 bg-light rounded">
+                        <i class="fas fa-clock fa-2x text-success mb-2"></i>
+                        <h4 class="mb-0">@(foods != null && foods.Any() ? Math.Round(foods.Average(f => f.HazirlanmaSuresi > 0 ? f.HazirlanmaSuresi : 15)) : 0) dk</h4>
+                        <small class="text-muted">Ort. Süre</small>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="p-3 bg-light rounded">
+                        <i class="fas fa-star fa-2x text-warning mb-2"></i>
+                        <h4 class="mb-0">4.8</h4>
+                        <small class="text-muted">Puan</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Menü -->
+    <div class="card border-0 shadow-sm mb-5">
+        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+            <h4 class="mb-0"><i class="fas fa-book-open text-primary me-2"></i>Menümüz</h4>
+            <a href="@Url.Action("ByRestaurant", "Food", new { id = Model.RestoranId })" class="btn btn-primary">
+                <i class="fas fa-th me-1"></i>Tüm Menüyü Gör
+            </a>
+        </div>
+        <div class="card-body">
+            @if (foods != null && foods.Any())
+            {
+                <div class="row">
+                    @foreach (var food in foods.Take(6))
+                    {
+                        <div class="col-lg-4 col-md-6 mb-4">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <img src="@(string.IsNullOrEmpty(food.ResimUrl) ? "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400" : food.ResimUrl)" 
+                                     class="card-img-top" style="height: 150px; object-fit: cover;" alt="@food.Ad">
+                                <div class="card-body">
+                                    <h6 class="card-title">@food.Ad</h6>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="text-success fw-bold">@food.Fiyat.ToString("F2") TL</span>
+                                        <span class="badge bg-info"><i class="fas fa-clock me-1"></i>@(food.HazirlanmaSuresi > 0 ? food.HazirlanmaSuresi : 15) dk</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <i class="fas fa-utensils fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">Henüz menü eklenmemiş</p>
+                </div>
+            }
+        </div>
+    </div>
+    
+    <!-- Değerlendirmeler -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+            <h4 class="mb-0"><i class="fas fa-star text-warning me-2"></i>Değerlendirmeler</h4>
+            @if (isLoggedIn)
+            {
+                <a href="@Url.Action("AddRestaurantRating", "Rating", new { id = Model.RestoranId })" class="btn btn-warning">
+                    <i class="fas fa-plus me-1"></i>Değerlendir
+                </a>
+            }
+        </div>
+        <div class="card-body">
+            <div class="text-center py-4">
+                <a href="@Url.Action("Restaurant", "Rating", new { id = Model.RestoranId })" class="btn btn-outline-primary btn-lg">
+                    <i class="fas fa-comments me-2"></i>Tüm Değerlendirmeleri Gör
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="mt-4">
+        <a href="@Url.Action("Index", "Restaurant")" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Restoranlara Dön
+        </a>
+    </div>
+</div>

@@ -42,6 +42,29 @@ namespace mvc_full.Models
 
         [Display(Name = "Resim URL")]
         public string ResimUrl { get; set; }              // رابط صورة الطعام
+
+        // ═══════════════════════════════════════════════════════════════════
+        // وقت التحضير - Hazırlanma Süresi
+        // ═══════════════════════════════════════════════════════════════════
+        [Display(Name = "Hazırlanma Süresi (dk)")]
+        [Range(1, 180, ErrorMessage = "Hazırlanma süresi 1-180 dakika arasında olmalıdır")]
+        public int HazirlanmaSuresi { get; set; } = 15;  // وقت التحضير بالدقائق (افتراضي 15 دقيقة)
+
+        // ═══════════════════════════════════════════════════════════════════
+        // نوع/صنف الطعام للبحث
+        // ═══════════════════════════════════════════════════════════════════
+        [Display(Name = "Yemek Kategorisi")]
+        public string Kategori { get; set; }  // نوع الطعام (Pizza, Kebap, Tatlı, etc.)
+        
+        // ═══════════════════════════════════════════════════════════════════
+        // كمية المخزون - Stok Miktarı
+        // ═══════════════════════════════════════════════════════════════════
+        [Display(Name = "Stok Miktarı")]
+        [Range(0, 10000, ErrorMessage = "Stok 0-10000 arasında olmalıdır")]
+        public int Stok { get; set; } = 100;  // الكمية المتاحة (افتراضي 100)
+        
+        [Display(Name = "Stok Durumu")]
+        public bool StokAktif { get; set; } = true;  // هل المنتج متاح للطلب
         
         // ═══════════════════════════════════════════════════════════════════
         // Foreign Key - المفتاح الأجنبي (يربط الطعام بالمطعم)

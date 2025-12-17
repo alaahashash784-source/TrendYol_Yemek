@@ -46,5 +46,26 @@ namespace mvc_full.Controllers
             }
             base.Dispose(disposing);
         }
+        
+        // إعادة تعيين كلمات مرور مديري المطاعم
+        public ActionResult ResetAdminPasswords()
+        {
+            var results = new List<string>();
+            string newPassword = "admin123";
+            
+            var restaurantAdmins = db.Musteriler.Where(m => m.IsRestoranAdmin == true).ToList();
+            
+            foreach (var admin in restaurantAdmins)
+            {
+                admin.Sifre = Helpers.SecurityHelper.HashPassword(newPassword);
+                results.Add(admin.Email + " - Password reset to: " + newPassword);
+            }
+            
+            db.SaveChanges();
+            
+            return Content("<h1>Passwords Reset!</h1><ul>" + 
+                string.Join("", results.Select(r => "<li>" + r + "</li>")) + 
+                "</ul><br/><a href='/Account/Login'>Go to Login</a>", "text/html");
+        }
     }
 }

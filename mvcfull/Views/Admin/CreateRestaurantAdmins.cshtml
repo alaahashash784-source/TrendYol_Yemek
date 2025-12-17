@@ -1,0 +1,93 @@
+@{
+    ViewBag.Title = "Restaurant Admins Created";
+    Layout = null;
+    var results = ViewBag.Results as List<string>;
+    var password = ViewBag.Password as string;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Restaurant Admins Created!</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-success">
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-success text-white text-center py-4">
+                    <h2><i class="fas fa-check-circle me-2"></i>Restaurant Admins Created!</h2>
+                </div>
+                <div class="card-body p-4">
+                    <div class="alert alert-success">
+                        <h5><i class="fas fa-info-circle me-2"></i>Results:</h5>
+                        <ul class="mb-0">
+                            @if (results != null)
+                            {
+                                foreach (var r in results)
+                                {
+                                    <li>@r</li>
+                                }
+                            }
+                        </ul>
+                    </div>
+                    
+                    <h4 class="mt-4 mb-3"><i class="fas fa-key me-2"></i>Login Credentials:</h4>
+                    <table class="table table-bordered table-striped">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Restaurant</th>
+                                <th>Email</th>
+                                <th>Password</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Turk Kebap Evi</td>
+                                <td><strong class="text-primary">kebap@admin.com</strong></td>
+                                <td><code>@password</code></td>
+                            </tr>
+                            <tr>
+                                <td>Pizza Cenneti</td>
+                                <td><strong class="text-primary">pizza@admin.com</strong></td>
+                                <td><code>@password</code></td>
+                            </tr>
+                            <tr>
+                                <td>Burger Bolgesi</td>
+                                <td><strong class="text-primary">burger@admin.com</strong></td>
+                                <td><code>@password</code></td>
+                            </tr>
+                            <tr>
+                                <td>Deniz Lezzetleri</td>
+                                <td><strong class="text-primary">deniz@admin.com</strong></td>
+                                <td><code>@password</code></td>
+                            </tr>
+                            <tr>
+                                <td>Asya Tatlari</td>
+                                <td><strong class="text-primary">asya@admin.com</strong></td>
+                                <td><code>@password</code></td>
+                            </tr>
+                            <tr>
+                                <td>Tatli Ruyalar</td>
+                                <td><strong class="text-primary">tatli@admin.com</strong></td>
+                                <td><code>@password</code></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <div class="text-center mt-4">
+                        <a href="@Url.Action("Login", "Account")" class="btn btn-primary btn-lg">
+                            <i class="fas fa-sign-in-alt me-2"></i>Go to Login
+                        </a>
+                        <a href="@Url.Action("Dashboard", "RestaurantAdmin")" class="btn btn-success btn-lg ms-2">
+                            <i class="fas fa-tachometer-alt me-2"></i>Admin Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

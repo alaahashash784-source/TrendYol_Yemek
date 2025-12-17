@@ -122,6 +122,10 @@ namespace mvc_full.Controllers
                         Session["MusteriId"] = musteri.MusteriId;  // رقم المستخدم
                         Session["MusteriAd"] = musteri.TamAd;      // اسم المستخدم
                         Session["IsAdmin"] = musteri.IsAdmin;      // هل أدمن؟
+                        
+                        // بيانات مدير المطعم
+                        Session["IsRestoranAdmin"] = musteri.IsRestoranAdmin;  // هل مدير مطعم؟
+                        Session["RestoranId"] = musteri.RestoranId;  // رقم المطعم المدار
 
                         // التوجيه للصفحة السابقة إن وجدت
                         if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
@@ -140,10 +144,10 @@ namespace mvc_full.Controllers
             return View(model);
         }
 
-        // ═══════════════════════════════════════════════════════════════════
+       
         // تسجيل الخروج
         // الرابط: /Account/Logout
-        // ═══════════════════════════════════════════════════════════════════
+        
         public ActionResult Logout()
         {
             // مسح جميع بيانات الجلسة
